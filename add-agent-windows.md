@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Wazuh Manager sudah berjalan
-- IP/hostname manager diketahui (localhost, IP, atau hostname alias)
+- Alamat manager diketahui (localhost, hostname, atau IP)
 - Agent key sudah di-extract dari manager
 
 ---
@@ -27,10 +27,10 @@ sudo ./manage_agents
 
 ## Langkah 2: Download Agent
 
-**Langsung paste URL ini di browser:**
+**Paste URL ini langsung di browser:**
 
 ```
-https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.7-1.msi
+https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.8-1.msi
 ```
 
 File akan langsung ter-download.
@@ -41,29 +41,29 @@ File akan langsung ter-download.
 
 1. Double-click file `.msi`
 2. Klik **Next** → **Accept** → **Next**
-3. Masukkan:
-   - **Wazuh Manager IP**: `172.28.208.227` (atau `localhost`, `hostname-alias`)
+3. Masukkan **Wazuh Manager address**: `localhost` (atau hostname/IP server)
 4. Klik **Next** → **Install**
 5. Klik **Finish**
 
 ---
 
-## Langkah 4: Import Key
+## Langkah 4: Import Key via GUI
 
 1. Buka **Wazuh Agent** dari Start Menu:
    ```
    Start → Wazuh → Wazuh Agent
    ```
-2. Tab **Management** → **Connect**
-3. Paste **key** yang sudah di-copy
-4. Klik **OK**
+2. Terdapat **2 kolom** yang perlu diisi:
+   - **Wazuh Manager address**: `localhost` (atau hostname server)
+   - **Key**: paste key yang sudah di-copy
+3. Klik **Connect** atau **OK**
 
 ---
 
 ## Langkah 5: Start Service
 
 ```powershell
-net start wazuh-agent
+net start WazuhSvc
 ```
 
 ---
@@ -72,7 +72,7 @@ net start wazuh-agent
 
 Buka Dashboard:
 ```
-https://172.28.208.227:443 → Agents → Status: Active (green)
+https://localhost:443 → Agents → Status: Active (green)
 ```
 
 ---
@@ -87,7 +87,7 @@ Start → Wazuh → Wazuh Agent
 **Fitur UI:**
 - **Overview** - Status agent dan konektivitas
 - **Management** - Connect/Disconnect/Restart agent
-- **Settings** - Konfigurasi manager IP
+- **Settings** - Konfigurasi manager address
 - **Logs** - Lihat agent logs secara real-time
 - **About** - Versi agent
 
@@ -108,16 +108,16 @@ Start → Wazuh → Wazuh Agent
 
 ```powershell
 # Restart agent
-net stop wazuh-agent && net start wazuh-agent
+net stop WazuhSvc && net start WazuhSvc
 
 # Cek status service
-sc query wazuh-agent
+sc query WazuhSvc
 
 # Lihat log
 type "C:\Program Files (x86)\ossec-agent\ossec.log"
 
 # Uninstall
-msiexec /x wazuh-agent-4.14.7-1.msi /qn
+msiexec /x wazuh-agent-4.14.8-1.msi /qn
 ```
 
 ---
@@ -128,10 +128,10 @@ Wazuh Agent auto-start sudah enabled secara default saat install.
 
 Cek:
 ```powershell
-sc qc wazuh-agent
+sc qc WazuhSvc
 ```
 
 Jika `AUTO_START` bukan `AUTO`, ubah:
 ```powershell
-sc config wazuh-agent start= auto
+sc config WazuhSvc start= auto
 ```
