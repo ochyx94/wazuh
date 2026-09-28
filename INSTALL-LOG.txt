@@ -52,7 +52,7 @@ sudo bash wazuh-install.sh -a
 [OUTPUT SUKSES]
 02/09/2026 14:57:48 INFO: You can access the web interface https://<wazuh-dashboard-ip>:443
 02/09/2026 14:57:48 INFO: User: admin
-02/09/2026 14:57:48 INFO: Password: Y6r4ruC.l*f8eXCbgGcfr?1eOAce?yyH
+02/09/2026 14:57:48 INFO: Password: [PASSWORD_GENERATED_OLEH_INSTALLER]
 02/09/2026 14:57:48 INFO: Installation finished.
 
 STATUS: ✅ BERHASIL
@@ -62,7 +62,7 @@ LANGKAH 5: SIMPAN CREDENTIALS
 ================================================================================
 URL Dashboard: https://localhost:443
 Username:     admin
-Password:     Y6r4ruC.l*f8eXCbgGcfr?1eOAce?yyH
+Password:     [PASSWORD_GENERATED_OLEH_INSTALLER]
 
 STATUS: ✅ TERSIMPAN
 
