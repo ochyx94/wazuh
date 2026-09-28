@@ -82,10 +82,63 @@ File akan langsung ter-download.
 
 ---
 
-## Langkah 5: Start Service
+## Langkah 5: Kelola Service
+
+### Cek Nama Service
+
+Sebelum mengelola service, cek nama service yang benar:
+
+```powershell
+sc query
+```
+
+Cari service dengan nama **Wazuh**.
+
+Contoh output:
+```
+SERVICE_NAME: WazuhSvc
+DISPLAY_NAME: Wazuh Agent
+```
+
+> **CATATAN:** Nama service mungkin berbeda. Pastikan cek dulu sebelum menjalankan perintah di bawah.
+
+### Cek Status Service
+
+```powershell
+sc query WazuhSvc
+```
+
+Output menunjukkan STATUS service:
+- `STOPPED` = service tidak jalan
+- `RUNNING` = service jalan
+- `PAUSED` = service pause
+
+### Kapan Start, Stop, Restart?
+
+| Kondisi | Aksi | Alasan |
+|---------|------|--------|
+| Agent tidak konek ke manager | **Restart** | Reset koneksi |
+| Setelah edit konfigurasi | **Restart** | Apply konfigurasi baru |
+| Agent macet/bermasalah | **Stop** lalu **Start** | Fresh start |
+| mau hentikan monitoring | **Stop** | Stop monitoring |
+| Mau mulai monitoring | **Start** | Mulai monitoring |
+
+### Start Service
 
 ```powershell
 net start WazuhSvc
+```
+
+### Stop Service
+
+```powershell
+net stop WazuhSvc
+```
+
+### Restart Service
+
+```powershell
+net stop WazuhSvc && net start WazuhSvc
 ```
 
 ---
@@ -119,8 +172,8 @@ C:\Program Files (x86)\ossec-agent\win32ui.exe
 
 | Masalah | Solusi |
 |---------|--------|
-| Agent tidak connect | Cek firewall: allow port 1514, 1515 |
-| Status "Disconnected" | Cek manager jalan: `sudo systemctl status wazuh-manager` |
+| Agent tidak connect | Restart service |
+| Status "Disconnected" | Cek manager jalan, restart service |
 | Key invalid | Hapus agent, add baru, extract key lagi |
 | Install gagal | Jalankan sebagai Administrator |
 
@@ -129,11 +182,20 @@ C:\Program Files (x86)\ossec-agent\win32ui.exe
 ## Command Penting
 
 ```powershell
-# Restart agent
-net stop WazuhSvc && net start WazuhSvc
+# Cek nama service
+sc query
 
 # Cek status service
 sc query WazuhSvc
+
+# Start service
+net start WazuhSvc
+
+# Stop service
+net stop WazuhSvc
+
+# Restart service
+net stop WazuhSvc && net start WazuhSvc
 
 # Lihat log
 type "C:\Program Files (x86)\ossec-agent\ossec.log"
