@@ -13,14 +13,37 @@
 ```bash
 cd /var/ossec/bin
 sudo ./manage_agents
+```
 
-# Pilih:
-# [A] Add new agent
-# Agent name: windows-pc
-# Agent IP: any
-# [E] Extract key for agent(s)
-# Copy key yang muncul
-# [Q] Quit
+Ikuti langkah-langkah berikut:
+
+```
+[A] Add new agent
+```
+
+Masukkan informasi agent:
+
+```
+Agent name: WINDOWS-PC
+        ↑ WAJIB DIISI - Gunakan nama komputer Windows kamu
+        Cara cek: Jalankan "hostname" di Command Prompt
+
+Agent IP: any
+        ↑ DISARANKAN "any" UNTUK PEMULA
+        Penjelasan:
+        - "any" = agent bisa konek dari IP berapa pun
+        - Kalau pakai IP spesifik, agent harus dari IP tersebut
+        - Untuk percobaan/belajar, pakai "any" lebih mudah
+```
+
+```
+[E] Extract key for agent(s)
+```
+
+Pilih agent ID yang baru dibuat, lalu **copy key** yang muncul.
+
+```
+[Q] Quit
 ```
 
 ---
@@ -134,3 +157,20 @@ Jika `AUTO_START` bukan `AUTO`, ubah:
 ```powershell
 sc config WazuhSvc start= auto
 ```
+
+---
+
+## Cara Cek Nama Komputer Windows
+
+```powershell
+# Via Command Prompt
+hostname
+
+# Via PowerShell
+$env:COMPUTERNAME
+
+# Via System Properties
+Win + R → sysdm.cpl → Computer Name
+```
+
+Nama komputer ini digunakan sebagai **Agent name** saat menambah agent di manager.
