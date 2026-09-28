@@ -37,17 +37,16 @@ File akan langsung ter-download.
 
 ---
 
-## Langkah 3: Install Agent (GUI)
+## Langkah 3: Install Agent
 
 1. Double-click file `.msi`
 2. Klik **Next** → **Accept** → **Next**
-3. Masukkan **Wazuh Manager address**: `localhost` (atau hostname/IP server)
-4. Klik **Next** → **Install**
-5. Klik **Finish**
+3. Klik **Next** → **Install** (TIDAK perlu masukkan address di sini)
+4. Klik **Finish**
 
 ---
 
-## Langkah 4: Import Key via GUI
+## Langkah 4: Konfigurasi via GUI
 
 1. Buka **Wazuh Agent** dari Start Menu:
    ```
@@ -56,7 +55,7 @@ File akan langsung ter-download.
 2. Terdapat **2 kolom** yang perlu diisi:
    - **Wazuh Manager address**: `localhost` (atau hostname server)
    - **Key**: paste key yang sudah di-copy
-3. Klik **Connect** atau **OK**
+3. Klik **Connect**
 
 ---
 
