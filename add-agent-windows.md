@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Wazuh Manager sudah berjalan
-- IP/hostname manager diketahui
+- IP/hostname manager diketahui (localhost, IP, atau hostname alias)
 - Agent key sudah di-extract dari manager
 
 ---
@@ -27,63 +27,36 @@ sudo ./manage_agents
 
 ## Langkah 2: Download Agent
 
-```powershell
-# Download langsung dari server
-curl -O https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.7-1.msi
+**Langsung paste URL ini di browser:**
+
+```
+https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.7-1.msi
 ```
 
-Atau buka browser:
-```
-https://172.28.208.227:443 → Agents → Deploy new agent
-```
+File akan langsung ter-download.
 
 ---
 
-## Langkah 3: Install Agent
-
-### Option A: Silent Install (Command Line)
-
-```powershell
-msiexec /i wazuh-agent-4.14.7-1.msi /qn ^
-    WAZUH_MANAGER="172.28.208.227" ^
-    WAZUH_MANAGER_PORT="1514" ^
-    WAZUH_PROTOCOL="tcp"
-```
-
-### Option B: GUI Install (MSI)
+## Langkah 3: Install Agent (GUI)
 
 1. Double-click file `.msi`
 2. Klik **Next** → **Accept** → **Next**
-3. Masukkan **Wazuh Manager IP**: `172.28.208.227`
-4. Port: `1514`
-5. Klik **Next** → **Install**
-6. Klik **Finish**
+3. Masukkan:
+   - **Wazuh Manager IP**: `172.28.208.227` (atau `localhost`, `hostname-alias`)
+4. Klik **Next** → **Install**
+5. Klik **Finish**
 
 ---
 
 ## Langkah 4: Import Key
 
-### Option A: Via UI (GUI)
-
-1. Buka **Wazuh Agent** dari Start Menu
+1. Buka **Wazuh Agent** dari Start Menu:
    ```
    Start → Wazuh → Wazuh Agent
    ```
-2. Tab **Settings** → **Configuration**
-3. Isi:
-   - Manager IP: `172.28.208.227`
-   - Port: `1514`
-4. Klik **Save**
-5. Tab **Management** → **Connect**
-
-### Option B: Via Command Line
-
-```powershell
-cd "C:\Program Files (x86)\ossec-agent"
-manage-agents.exe -i
-
-# Paste key → Enter → Y
-```
+2. Tab **Management** → **Connect**
+3. Paste **key** yang sudah di-copy
+4. Klik **OK**
 
 ---
 
@@ -106,16 +79,15 @@ https://172.28.208.227:443 → Agents → Status: Active (green)
 
 ## Wazuh Agent UI
 
-Wazuh Agent punya GUI interface untuk management:
-
+Buka dari Start Menu:
 ```
-Start Menu → Wazuh → Wazuh Agent
+Start → Wazuh → Wazuh Agent
 ```
 
 **Fitur UI:**
 - **Overview** - Status agent dan konektivitas
 - **Management** - Connect/Disconnect/Restart agent
-- **Settings** - Konfigurasi manager IP, port, protocol
+- **Settings** - Konfigurasi manager IP
 - **Logs** - Lihat agent logs secara real-time
 - **About** - Versi agent
 
