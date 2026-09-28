@@ -1,0 +1,414 @@
+================================================================================
+FILE INTEGRITY MONITORING - USER FOLDERS
+================================================================================
+
+FILE: fim-config.xml
+TARGET: Windows Agent
+PURPOSE: Monitor user folders (Downloads, Desktop, Documents) secara realtime
+ untuk deteksi file creation, modification, dan deletion
+
+================================================================================
+PANDUAN PENGGANTIAN USERNAME
+================================================================================
+
+  GANTI 'WINDOWS_USER' DENGAN USERNAME WINDOWS KAMU
+
+  CARA CEK USERNAME:
+  - Buka Command Prompt / PowerShell
+  - Ketik: echo %USERNAME% atau whoami
+  - Hasilnya adalah username Windows kamu
+
+  CONTOH:
+  - Username "admin"     → C:\Users\admin\Downloads
+  - Username "john"     → C:\Users\john\Downloads
+  - Username "laptop-ok" → C:\Users\laptop-ok\Downloads
+
+================================================================================
+CARA APPLY CONFIG
+================================================================================
+
+1. Edit file di Windows Agent:
+   C:\Program Files (x86)\ossec-agent\ossec.conf
+
+2. Cari section <syscheck>, GANTI atau TAMBAHKAN dengan config ini
+
+3. GANTI 'WINDOWS_USER' dengan username Windows kamu
+
+4. Restart Agent:
+   net stop wazuh-agent
+   net start wazuh-agent
+
+   atau via PowerShell (Admin):
+   Restart-Service -Name "Wazuh"
+
+================================================================================
+CONFIG (UNTUK ossec.conf)
+================================================================================
+
+<ossec_config>
+  <syscheck>
+
+    <!--
+      ========================================================================
+      MONITORED DIRECTORIES
+      ========================================================================
+
+      GANTI 'WINDOWS_USER' DENGAN USERNAME WINDOWS KAMU!
+    -->
+    <directories check_all="yes" realtime="yes">C:\Users\WINDOWS_USER\Downloads</directories>
+    <directories check_all="yes" realtime="yes">C:\Users\WINDOWS_USER\Desktop</directories>
+    <directories check_all="yes" realtime="yes">C:\Users\WINDOWS_USER\Documents</directories>
+
+    <!--
+      ========================================================================
+      IGNORE PATTERNS
+      ========================================================================
+      File-file yang TIDAK akan di-monitor
+
+      PATTERN SREGEX:
+      - \.tmp$    = File berakhiran .tmp (temporary files)
+      - \.log$    = File berakhiran .log (log files)
+      - \.crdownload$ = File Chrome temporary saat download
+      - \.part$   = File temporary browser (Firefox, dll)
+      - \.partial$ = File partial download (IE, Edge)
+      - \.temp$   = File berakhiran .temp
+      - \.cache$  = File cache
+      - \.evtx$   = Windows Event Log files
+
+      CARA SREGEX:
+      - $ = akhir string
+      - | = OR (atau)
+      - \. = literal dot
+    -->
+    <ignore type="sregex">\.tmp$|\.log$|\.crdownload$|\.part$|\.partial$|\.temp$|\.cache$|\.evtx$</ignore>
+
+    <!--
+      ========================================================================
+      SCAN FREQUENCY
+      ========================================================================
+      Interval scan dalam detik (default: 12 jam = 43200 detik)
+
+      PILIH SALAH SATU:
+      - 3600      = 1 jam
+      - 7200      = 2 jam
+      - 21600     = 6 jam
+      - 43200     = 12 jam
+      - 86400     = 24 jam (1 hari)
+    -->
+    <frequency>43200</frequency>
+
+    <!-- Scan saat agent start -->
+    <scan_on_start>yes</scan_on_start>
+
+    <!-- Ignore file yang tidak berubah setelah alert -->
+    <auto_ignore>yes</auto_ignore>
+
+    <!-- Alert untuk file baru -->
+    <alert_new_files>yes</alert_new_files>
+
+  </syscheck>
+</ossec_config>
+
+================================================================================
+PANDUAN ATRIBUT FIM (LENGKAP)
+================================================================================
+
+------------------------------------------------------------------------------
+DIRECTORIES ATTRIBUTES
+------------------------------------------------------------------------------
+
+  realtime="yes"
+  -----------------------
+  Fungsi : Monitor perubahan secara real-time menggunakan Windows API
+  Nilai  : yes | no
+  Default: no
+  Contoh : <directories realtime="yes">C:\Users\ok\Downloads</directories>
+
+  CATATAN:
+  - Menggunakan Windows ReadDirectoryChangesW API
+  - Tidak bisa deteksi delete dengan sempurna di Windows
+  - Butuh Windows Vista atau lebih baru
+
+  ----------------------------------------------------------------------------
+
+  check_all="yes"
+  -----------------------
+  Fungsi : Cek semua attribute file yang berubah
+  Nilai  : yes | no
+  Default: yes
+  Attrib : size, permission, owner, group, md5, sha1, sha256, modification_time
+
+  ATTRIBUTES YANG DICEK (jika check_all="yes"):
+  - size          = Ukuran file
+  - permission    = Hak akses file
+  - owner         = Owner file
+  - group         = Group file
+  - md5           = MD5 hash
+  - sha1          = SHA1 hash
+  - sha256        = SHA256 hash
+  - mtime         = Modification time
+  - inode         = Inode number (Linux only)
+
+  ATTRIBUTES LEBIH SPESIFIK:
+  - check_size="yes"    = Cek perubahan ukuran
+  - check_perm="yes"    = Cek perubahan permission
+  - check_owner="yes"   = Cek perubahan owner
+  - check_group="yes"   = Cek perubahan group
+  - check_md5sum="yes"  = Cek MD5 hash
+  - check_sha1sum="yes" = Cek SHA1 hash
+  - check_sha256sum="yes" = Cek SHA256 hash
+  - check_mtime="yes"   = Cek modification time
+
+  Contoh:
+  <directories check_all="yes" check_md5sum="yes" check_sha256sum="yes">C:\Users\ok\Desktop</directories>
+
+  ----------------------------------------------------------------------------
+
+  recursion_level="N"
+  -----------------------
+  Fungsi : Kedalaman scan subfolder
+  Nilai  : 0 = tidak ada subfolder, 1 = 1 level, dst
+  Default: siblings (sesama level, tidak masuk subfolder)
+  Contoh : recursion_level="0" = hanya file di folder utama
+
+  CONTOH:
+  - recursion_level="0"    = Hanya folder itu sendiri (tidak masuk subfolder)
+  - recursion_level="1"    = Folder + 1 level subfolder
+  - recursion_level="2"    = Folder + 2 level subfolder
+  - recursion_level="99"   = Deep scan (tidak direkomendasikan)
+
+  WARNING: recursion_level tinggi akan memperlambat scan
+
+  ----------------------------------------------------------------------------
+
+  restrict="pattern"
+  -----------------------
+  Fungsi : Filter tipe file yang dimonitor berdasarkan regex
+  Nilai  : Regex pattern
+  Contoh : restrict="\.exe$" = Hanya file .exe
+
+  CONTOH PATTERN:
+  - restrict="\.exe$|\.dll$|\.sys$"  = Hanya .exe, .dll, .sys
+  - restrict="\.ps1$"                 = Hanya PowerShell scripts
+  - restrict="\.doc$|\.docx$"         = Hanya Word documents
+  - restrict="\.pdf$"                  = Hanya PDF files
+
+  ----------------------------------------------------------------------------
+
+  whodata="yes"
+  -----------------------
+  Fungsi : Monitor WHO (user) melakukan perubahan
+  Nilai  : yes | no
+  Default: no
+
+  BENEFIT:
+  - Know siapa yang membuat/mengubah file
+  - Know user SID dan username
+  - Know process yang membuat file
+
+  REQUIREMENTS:
+  - Windows only
+  - UAC mungkin perlu dinonaktifkan untuk full visibility
+  - More resource intensive
+
+  Contoh:
+  <directories check_all="yes" realtime="yes" whodata="yes">C:\Users\ok\Downloads</directories>
+
+  ----------------------------------------------------------------------------
+
+  tags="label1,label2"
+  -----------------------
+  Fungsi : Memberi label/kategori untuk filtering di dashboard
+  Nilai  : Comma-separated string
+  Contoh : tags="critical,startup,malware"
+
+  GUNAA:
+  - Filter alerts berdasarkan tag di dashboard
+  - Kategorisasi lebih mudah
+  - Grouping untuk reporting
+
+  Contoh:
+  <directories check_all="yes" tags="user-folders,downloads">C:\Users\ok\Downloads</directories>
+
+  ----------------------------------------------------------------------------
+
+  arch="32" atau arch="64"
+  -----------------------
+  Fungsi : Monitor folder berdasarkan arsitektur Windows
+  Nilai  : 32 | 64 | both
+  Default: both
+  Contoh : arch="64" = Hanya monitor folder 64-bit
+
+  CONTOH:
+  - arch="64"   = C:\Windows\System32 (64-bit)
+  - arch="32"   = C:\Windows\SysWOW64 (32-bit on 64-bit)
+  - arch="both" = Monitor keduanya
+
+------------------------------------------------------------------------------
+IGNORE PATTERNS
+------------------------------------------------------------------------------
+
+  <ignore type="sregex">pattern</ignore>
+  -----------------------
+  Fungsi : Ignore file berdasarkan regex pattern
+  Type   : sregex = Simple regex
+
+  PATTERN SREGEX:
+  - \.tmp$    = File berakhiran .tmp
+  - \.log$    = File berakhiran .log
+  - \.tmp$|\.log$ = File .tmp atau .log
+  - temp      = File mengandung kata "temp"
+  - \.tmp$|\.log$|\.cache$
+
+  CATATAN:
+  - Simple regex, tidak support full regex
+  - Case insensitive
+  - $ = akhir string
+
+  ----------------------------------------------------------------------------
+
+  <ignore>full_path</ignore>
+  -----------------------
+  Fungsi : Ignore path/file tertentu secara literal
+  Contoh : <ignore>C:\Windows\System32\config\systemprofile</ignore>
+
+  CONTOH:
+  - <ignore>C:\Windows\System32\config</ignore>
+  - <ignore>%WINDIR%\System32\config</ignore>
+  - <ignore>C:\Users\ok\AppData\Local\Temp</ignore>
+
+------------------------------------------------------------------------------
+SCAN SETTINGS
+------------------------------------------------------------------------------
+
+  <frequency>N</frequency>
+  -----------------------
+  Fungsi : Interval scan periodic (dalam detik)
+  Default: 43200 (12 jam)
+
+  CONTOH:
+  - <frequency>3600</frequency>   = 1 jam
+  - <frequency>7200</frequency>   = 2 jam
+  - <frequency>21600</frequency>  = 6 jam
+  - <frequency>43200</frequency>  = 12 jam
+  - <frequency>86400</frequency>  = 24 jam
+
+  ----------------------------------------------------------------------------
+
+  <scan_on_start>yes</scan_on_start>
+  -----------------------
+  Fungsi : Jalankan scan pertama saat agent start
+  Nilai  : yes | no
+  Default: yes
+
+  ----------------------------------------------------------------------------
+
+  <auto_ignore>yes</auto_ignore>
+  -----------------------
+  Fungsi : Ignore file yang sama setelah 3 kali alert
+  Nilai  : yes | no
+  Default: yes
+
+  CATATAN:
+  - File akan di-ignore setelah unchanged setelah 3 kali scan
+  - Tidak berlaku untuk file baru
+
+  ----------------------------------------------------------------------------
+
+  <alert_new_files>yes</alert_new_files>
+  -----------------------
+  Fungsi : Alert saat ada file baru
+  Nilai  : yes | no
+  Default: yes
+
+  ----------------------------------------------------------------------------
+
+  <process_priority>N</process_priority>
+  -----------------------
+  Fungsi : Prioritas proses scan (lower = higher priority)
+  Nilai  : -20 to 20
+  Default: 10
+
+  CONTOH:
+  - process_priority="10"  = Normal priority
+  - process_priority="15"  = Lower priority (lebih lambat)
+  - process_priority="5"   = Higher priority (lebih cepat, lebih makan resource)
+
+  ----------------------------------------------------------------------------
+
+  <max_eps>N</max_eps>
+  -----------------------
+  Fungsi : Maximum events per second yang dikirim
+  Nilai  : Number
+  Default: 50
+
+  GUNAA:
+  - Prevent flood ke manager
+  - Jika banyak file berubah, events di-queue dan dikirim perlahan
+
+  ----------------------------------------------------------------------------
+
+  <windows_audit_interval>N</windows_audit_interval>
+  -----------------------
+  Fungsi : Interval cek Windows audit settings (dalam detik)
+  Default: 60
+
+  ----------------------------------------------------------------------------
+
+  <synchronization>
+    <enabled>yes</enabled>
+    <interval>5m</interval>
+    <max_eps>10</max_eps>
+  </synchronization>
+  -----------------------
+  Fungsi : Sync database FIM antar agents
+  Nilai  : yes | no | interval | max_eps
+
+================================================================================
+VERIFIKASI
+================================================================================
+
+1. Cek ossec.conf sudah ter-update:
+   type "C:\Program Files (x86)\ossec-agent\ossec.conf"
+
+2. Cek agent terhubung ke Manager:
+   Buka Dashboard > Agents > Status: Active
+
+3. Test: Buat file test di folder yang dimonitor
+   echo "test" > C:\Users\WINDOWS_USER\Downloads\test.txt
+
+4. Cek alert di Dashboard:
+   - Menu: Security Events
+   - Filter: rule.id: 554 (file added)
+   - Atau cari: syscheck.path: "C:\\Users\\WINDOWS_USER\\Downloads"
+
+================================================================================
+RULE IDS UNTUK FILTER
+================================================================================
+
+  Rule ID 554 = File added
+  Rule ID 550 = File modified
+  Rule ID 553 = File deleted
+  Rule ID 551 = File integrity changed (hash changed)
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Q: File delete tidak terdeteksi?
+A: Realtime FIM di Windows tidak bisa deteksi delete dengan sempurna.
+   Gunakan scheduled scan (frequency) untuk deteksi delete.
+
+Q: %USERPROFILE% tidak work?
+A: Wazuh Agent jalan sebagai SYSTEM account, bukan user biasa.
+   Gunakan literal path: C:\Users\USERNAME\Downloads
+
+Q: Alert flood?
+A: Kurangi recursion_level atau tambahkan ignore patterns.
+   Gunakan max_eps untuk limit events.
+
+Q: Agent tidak start setelah edit config?
+A: Cek XML syntax. Pastikan tidak ada karakter khusus.
+   Gunakan XML validator online.
+
+================================================================================
