@@ -1,0 +1,266 @@
+================================================================================
+WINDOWS EVENT IDs - SECURITY MONITORING REFERENCE
+================================================================================
+SOURCE: Microsoft Windows Event Log
+CATEGORIES: Application, Security, System
+LEVEL: Info, Warning, Error, Critical, Audit Success, Audit Failure
+================================================================================
+
+TINGKAT BAHAYA:
+---------------
+🔴 CRITICAL  - Deteksi aktif, butuh respons segera
+🟠 HIGH      - Indikasi serangan, perlu investigasi
+🟡 MEDIUM    - Anomali, perlu perhatian
+🟢 LOW       - Info normal, kadang bisa noise
+⚪ INFO      - Normal activity, biasanya tidak perlu action
+
+================================================================================
+SECURITY LOG (paling penting untuk SIEM)
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4624   | Logon Success                         | User login berhasil
+       | ⚠️ Baseline: catat siapa login, kapan, dari mana
+4625   | Logon Failure                        | Login gagal (brute force indicator)
+       | ⚠️ Banyak 4625 = kemungkinan brute force
+4672   | Special Privileges Assigned           | Admin privileges diberikan
+       | ⚠️ Baseline: harus ada untuk admin, aneh kalau untuk user biasa
+4719   | Audit Policy Changed                  | Policy keamanan diubah
+       | ⚠️ Attacker sering matikan audit untuk hide tracks
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4634   | Logoff                                | User logout
+       | ⚠️ Normal, tapi correlated dengan 4624 berguna untuk session tracking
+4648   | Explicit Credentials Used             | Logon dengan credentials lain
+       | ⚠️ Bisa indicate横向移动 (lateral movement)
+4670   | Object Permissions Changed            | Permissions objek berubah
+       | ⚠️ Attacker modify permissions untuk akses
+4720   | Account Created                       | User account baru dibuat
+       | ⚠️ Attacker buat account untuk persistence
+4722   | Account Enabled                       | Account di-enable
+       | ⚠️ Attacker enable account yang disable
+4723   | Password Change Attempt               | Attempt ubah password
+       | ⚠️ Attacker coba ubah password victim
+4724   | Password Reset Attempt                | Attempt reset password
+       | ⚠️ Attacker reset password victim
+4725   | Account Disabled                      | Account di-disable
+       | ⚠️ Attacker disable account
+4726   | Account Deleted                       | Account dihapus
+       | ⚠️ Attacker hapus account
+4732   | Member Added to Security Group       | User ditambahkan ke group
+       | ⚠️ Attacker tambahkan user ke Administrators/Backup Operators
+4733   | Member Removed from Security Group   | User dihapus dari group
+       | ⚠️ Attacker remove user dari group
+4754   | Group Created                        | Security group baru dibuat
+4756   | Member Added to Security Group       | User masuk ke group
+4757   | Member Removed from Security Group   | User keluar dari group
+4767   | Account Unlocked                      | Account di-unlock
+       | ⚠️ Setelah brute force, account unlock = interesting
+4768   | Kerberos TGT Requested                | Ticket Granting Ticket request
+       | ⚠️ Baseline untuk normal user, weird kalau server
+4769   | Kerberos Service Ticket Request       | Service ticket request
+       | ⚠️ Bisa indicate pass-the-ticket attack
+4771   | Kerberos Pre-Auth Failure            | Kerberos pre-auth gagal
+       | ⚠️ Brute force indicator (AS-REP Roasting)
+4776   | NTLM Authentication Failed           | NTLM auth gagal
+       | ⚠️ Could be pass-the-hash attempt
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+4688   | Process Created                       | Process baru dibuat
+       | ⚠️ Baseline creation + command line penting
+4689   | Process Terminated                   | Process dihentikan
+       | ⚠️ Bisa indicate malware removal
+4697   | Service Installed                    | Service baru diinstall
+       | ⚠️ Attacker install service untuk persistence
+4698   | Scheduled Task Created               | Task baru dibuat
+       | ⚠️ ATT&CK T1053 - sering dipakai attacker
+4699   | Scheduled Task Deleted               | Task dihapus
+4702   | Scheduled Task Updated               | Task diupdate
+4728   | Member Added to Security Group       | User ditambahkan ke group (domain)
+4738   | User Account Updated                 | Account diupdate
+4740   | Account Locked Out                   | Account locked (brute force)
+       | ⚠️ Catat siapa, dari mana
+4765   | SID History Added                    | SID history dimodify
+       | ⚠️ bisa indicate account clone
+4778   | Session Reconnected                  | User reconnect ke RDP
+4779   | Session Disconnected                 | User disconnect dari RDP
+       | ⚠️ RDP hijacking indicator
+
+🟢 LOW / INFO
+---------------------------------------------------------------------------
+4627   | Group Membership Enumerated          | Group membership di-enumerate
+       | ⚠️ Biasanya recon, tapi correlated berguna
+4647   | User initiated logoff                | User initiate logoff
+4658   | Handle Opened                        | Handle ke object dibuka
+4664   | Hard Link Created                    | Hard link dibuat (NTFS)
+4673   | Sensitive Privilege Used              | Sensitive privilege used
+4674   | Object Operation Attempted           | Operation ke protected object
+
+================================================================================
+SYSTEM LOG
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+6008   | Unexpected Shutdown                  | System shutdown tidak normal
+       | ⚠️ Bisa hardware failure atau malware (ransomware pre-shutdown)
+1040   | Audit Log Cleared                    | Event log di-clear
+       | ⚠️ Attacker clear log untuk hide tracks
+
+🟠 HIGH
+---------------------------------------------------------------------------
+6005   | Event Log Service Started           | Event log service start
+       | ⚠️ Bisa indicate log clear atau service restart
+6006   | Event Log Service Stopped            | Event log service stop
+       | ⚠️ Attacker stop service sebelum clear log
+7045   | Service Installed                   | Service baru diinstall (ANY)
+       | ⚠️ ATT&CK T1543.003 - Windows Service
+7030   | Service Crashed                     | Service crash
+       | ⚠️ Bisa indicate exploit attempt
+7036   | Service State Changed               | Service start/stop/restart
+       | ⚠️ Baseline: catat service mana, kapan, oleh siapa
+7040   | Service Start Type Changed           | Start type diubah
+       | ⚠️ Attacker rubah service jadi Automatic
+1001   | BugCheck (Blue Screen)              | Blue Screen / crash dump
+       | ⚠️ Bisa hardware failure atau malware
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+6013   | Windows Uptime                       | System uptime (daily count)
+       | ⚠️ Baseline, berguna untuk corelasi
+7000   | Service Control Manager Error        | SCM error
+       | ⚠️ Service gagal start
+7001   | Service Dependency Failed            | Dependency service gagal
+      7002   | Service Control Manager Event     | SCM event
+       | ⚠️ Error penting
+7031   | Service Crashed                     | Service crash
+       | ⚠️ Kombinasi banyak = suspicious
+7034   | Service Terminated Unexpectedly      | Service terminate tidak expected
+       | ⚠️ Bisa indicate malware
+
+================================================================================
+APPLICATION LOG
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+1000   | Application Error                    | App crash
+       | ⚠️ Catat app name + crash address
+1001   | Application Hang                     | App hang
+       | ⚠️ Bisa indicate exploitation
+1002   | Application Crash                    | App crash (hang debugging)
+1074   | Application/Service Shutdown         | App/service shutdown by user/system
+       | ⚠️ Baseline: siapa shutdown, kapan
+1076   | Unexpected Shutdown                   | User pilih shutdown unexpectedly
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+1517   | User Profile Archived                 | Profile di-archive (cleanup)
+1518   | User Profile Handle Validation       | Profile handle validated
+1519   | User Profile Loaded                  | Profile loaded
+1524   | User Profile Unloaded                | Profile unloaded
+
+================================================================================
+POWERSHELL LOGGING (tingkatkan visibility)
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4103   | Script Block Logging                | PowerShell execute script block
+       | ⚠️ Deteksi encoded command, malicious scripts
+4104   | Script Block Execution              | Script block executed (high verbosity)
+       | ⚠️ ATT&CK T1059.001 - PowerShell attack
+8004   | Provider Lifecycle Event             | Provider started/stopped
+       | ⚠️ Baseline untuk powershell operation
+
+⚪ INFO
+---------------------------------------------------------------------------
+4096   | Pipeline Execution Details           | PS pipeline execution
+400     | Engine Lifecycle                     | PS engine start
+600     | Provider Lifecycle                   | Provider started
+
+================================================================================
+WMI LOGGING (tingkatkan detection)
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+5857   | WMI Activity                         | WMI activity (filter, consumer)
+       | ⚠️ Deteksi lateral movement via WMI
+5858   | WMI Activity                        | WMI permanent event consumer
+       | ⚠️ ATT&CK T1047 - Windows Management Instrumentation
+5859   | WMI Activity                        | Consumer started
+5860   | WMI Activity                        | Filter unbound
+
+================================================================================
+DEFENDER / SECURITY CENTER (Windows 10/11)
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+1116   | Malware Protection - Detection     | Defender detected malware
+1117   | Malware Protection - Action        | Defender took action
+       | ⚠️ Catat: malware name, action taken, file path
+1000   | Antivirus - Detection               | Antivirus detected
+1001   | Antivirus - Signature Update         | AV signature update
+       | ⚠️ Baseline: kapan update, apakah berhasil
+
+================================================================================
+RDP LOGGING (Enhanced)
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4624   | RDP Session Created                  | (Type 10 = RemoteInteractive)
+       | ⚠️ Baseline: catat source IP untuk RDP
+4648   | RDP Explicit Credentials            | RDP with explicit credentials
+       | ⚠️ Could be RDP hijacking
+4778   | RDP Session Reconnected             | User reconnect ke existing RDP
+       | ⚠️ Perhatikan waktu dan source
+4779   | RDP Session Disconnected            | RDP session disconnect
+       | ⚠️ Kadang legitimate, kadang attacker disconnect victim
+
+================================================================================
+SAMBA / SMB LOGGING (jika ada file share)
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4624   | SMB Session Established             | SMB connection (audit file access)
+5140   | Network Share Object Accessed        | File share accessed
+       | ⚠️ Baseline: siapa akses share apa
+5142   | Network Share Created               | Share created
+       | ⚠️ Attacker buat share untuk exfil
+5143   | Network Share Modified               | Share modified
+5144   | File Share Changed                  | Share permissions changed
+
+================================================================================
+SERVICE PRINCIPAL NAMES (SPN) - KERBEROS
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4768   | TGT Requested                       | Kerberos TGT requested
+       | ⚠️ Baseline per user dan service account
+4769   | Service Ticket Requested             | SPN accessed
+       | ⚠️ Anomali: user/service akses SPN yang tidak biasa
+4770   | Service Ticket Renewed               | Ticket renewed
+       | ⚠️ Baseline untuk long-running service
+
+================================================================================
+CREDENTIAL THEFT INDICATORS (Red Team)
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4624   | NTLM Logon Type 3                   | Network logon (pass-the-hash)
+       | ⚠️ Catat: Logon Type 3 dari source yang tidak biasa
+4672   | Admin logon to non-admin account    | Admin ke user biasa = suspicious
+       | ⚠️ ATT&CK T1071.003 - valid accounts
+4649   | SPN downgrade detected               | Kerberos downgrade attack
+       | ⚠️ Could be golden ticket
+
+================================================================================

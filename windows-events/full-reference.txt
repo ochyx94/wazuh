@@ -1,0 +1,1189 @@
+================================================================================
+SECURITY LOG - ACCOUNT & LOGON EVENTS
+================================================================================
+CATEGORY: Security
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4624   | LOGON SUCCESS
+       | User login BERHASIL
+       | DANGER: Catat baseline - siapa login, kapan, dari mana (IP)
+       | Logon Type:
+       |   2 = Interactive (local keyboard)
+       |   3 = Network (file share, etc)
+       |   4 = Batch (scheduled task)
+       |   7 = Unlock (workstation unlock)
+       |   10 = RemoteInteractive (RDP)
+       |   11 = CachedInteractive (logon with cached creds)
+       |
+       | QUERY: rule.id: 4624
+
+4625   | LOGON FAILURE
+       | Login GAGAL
+       | DANGER: ⚠️ Banyak 4625 = BRUTE FORCE ATTACK
+       | Catat: Account name, Source IP, Logon Type
+       | QUERY: rule.id: 4625
+
+4672   | SPECIAL PRIVILEGES ASSIGNED
+       | Admin privileges diberikan ke user
+       | DANGER: ⚠️ Baseline untuk admin accounts
+       | Jika user biasa dapat privileges = SUSPICIOUS
+       | privileges: SeSecurityPrivilege, SeBackupPrivilege, etc
+       | QUERY: rule.id: 4672
+
+4719   | AUDIT POLICY CHANGED
+       | Policy keamanan diubah
+       | DANGER: ⚠️ Attacker sering matikan audit untuk hide tracks
+       | Siapa yang ubah, kapan, apa yang diubah
+       | QUERY: rule.id: 4719
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4634   | LOGOFF
+       | User logout
+       | DANGER: Normal, tapi berguna untuk session tracking
+       | Corelasi dengan 4624 untuk dapat session duration
+
+4648   | EXPLICIT CREDENTIALS USED
+       | Logon dengan credentials lain (runas)
+       | DANGER: ⚠️ Indicates LATERAL MOVEMENT
+       | Siapa, credentials mana yang dipakai
+
+4670   | OBJECT PERMISSIONS CHANGED
+       | Permissions objek berubah
+       | DANGER: Attacker modify permissions untuk akses
+
+4720   | ACCOUNT CREATED
+       | User account baru dibuat
+       | DANGER: ⚠️ Attacker buat account untuk PERSISTENCE
+
+4722   | ACCOUNT ENABLED
+       | Account di-enable
+       | DANGER: ⚠️ Attacker enable account yang disable
+
+4723   | PASSWORD CHANGE ATTEMPT
+       | Attempt ubah password
+       | DANGER: ⚠️ Attacker coba ubah password victim
+
+4724   | PASSWORD RESET ATTEMPT
+       | Attempt reset password
+       | DANGER: ⚠️ Attacker reset password victim
+
+4725   | ACCOUNT DISABLED
+       | Account di-disable
+       | DANGER: ⚠️ Attacker disable account
+
+4726   | ACCOUNT DELETED
+       | Account dihapus
+       | DANGER: ⚠️ Attacker hapus account
+
+4732   | MEMBER ADDED TO SECURITY GROUP
+       | User ditambahkan ke security group
+       | DANGER: ⚠️ Attacker tambahkan ke Administrators/Backup Operators
+       | Target: Domain Admins, Enterprise Admins, Administrators
+
+4733   | MEMBER REMOVED FROM SECURITY GROUP
+       | User dihapus dari security group
+       | DANGER: ⚠️ Attacker remove user dari group
+
+4754   | GROUP CREATED
+       | Security group baru dibuat
+       | DANGER: Attacker buat group untuk organize
+
+4756   | MEMBER ADDED TO SECURITY GROUP
+       | User masuk ke group (domain)
+       | DANGER: Same as 4732
+
+4757   | MEMBER REMOVED FROM SECURITY GROUP
+       | User keluar dari group (domain)
+       | DANGER: Same as 4733
+
+4767   | ACCOUNT UNLOCKED
+       | Account di-unlock setelah lockout
+       | DANGER: ⚠️ Setelah brute force, unlock = interesting
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+4740   | ACCOUNT LOCKED OUT
+       | Account LOCKED (brute force)
+       | DANGER: Catat siapa, dari mana (source DC)
+
+4765   | SID HISTORY ADDED
+       | SID history dimodify
+       | DANGER: ⚠️ Can indicate account clone
+
+4778   | SESSION RECONNECTED
+       | User reconnect ke RDP
+       | DANGER: ⚠️ Perhatikan waktu dan source
+
+4779   | SESSION DISCONNECTED
+       | User disconnect dari RDP session
+       | DANGER: Kadang legitimate, kadang attacker disconnect victim
+
+🟢 LOW / INFO
+---------------------------------------------------------------------------
+4627   | GROUP MEMBERSHIP ENUMERATED
+       | Group membership di-enumerate
+       | DANGER: Biasanya recon, tapi correlated berguna
+
+4647   | USER INITIATED LOGOFF
+       | User initiate logoff sendiri
+
+4658   | HANDLE OPENED
+       | Handle ke object dibuka
+
+4664   | HARD LINK CREATED
+       | Hard link dibuat (NTFS)
+
+4673   | SENSITIVE PRIVILEGE USED
+       | Sensitive privilege used
+
+4674   | OBJECT OPERATION ATTEMPTED
+       | Operation ke protected object
+
+4728   | MEMBER ADDED TO SECURITY GROUP (domain)
+       | User ditambahkan ke group (domain)
+
+4738   | USER ACCOUNT UPDATED
+       | Account diupdate
+
+================================================================================
+================================================================================
+SYSTEM LOG - SERVICE & SHUTDOWN EVENTS
+================================================================================
+CATEGORY: System
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+6008   | UNEXPECTED SHUTDOWN
+       | System shutdown tidak normal
+       | DANGER: ⚠️ Bisa hardware failure ATAU malware (ransomware pre-shutdown)
+       | Baseline: jadwalkan shutdowns legitimate
+
+1040   | AUDIT LOG CLEARED
+       | Event log di-clear
+       | DANGER: ⚠️ Attacker clear log untuk HIDE TRACKS
+       | Siapa yang clear, kapan
+
+🟠 HIGH
+---------------------------------------------------------------------------
+6005   | EVENT LOG SERVICE STARTED
+       | Event log service start
+       | DANGER: ⚠️ Bisa indicate log clear ATAU service restart
+       | Baseline: kapan restart
+
+6006   | EVENT LOG SERVICE STOPPED
+       | Event log service STOP
+       | DANGER: ⚠️ Attacker stop service SEBELUM clear log
+       | Kombinasi: 6006 + 1040 = SUSPICIOUS
+
+7045   | SERVICE INSTALLED
+       | Service baru diinstall
+       | DANGER: ⚠️ ATT&CK T1543.003 - Windows Service
+       | Attacker install service untuk PERSISTENCE
+       | Service name, binary path, service type
+
+7030   | SERVICE CRASHED
+       | Service crash
+       | DANGER: ⚠️ Bisa indicate exploit attempt
+
+7036   | SERVICE STATE CHANGED
+       | Service start/stop/restart
+       | DANGER: ⚠️ Baseline: catat service mana, kapan, oleh siapa
+
+7040   | SERVICE START TYPE CHANGED
+       | Start type service diubah
+       | DANGER: ⚠️ Attacker rubah service jadi Automatic/Delayed
+
+1001   | BUGCHECK (BLUE SCREEN)
+       | Blue Screen / crash dump
+       | DANGER: ⚠️ Bisa hardware failure ATAU malware
+       | Catat: BugCheckCode, DumpFile
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+6013   | WINDOWS UPTIME
+       | System uptime (daily count)
+       | DANGER: Baseline, berguna untuk corelasi
+
+7000   | SERVICE CONTROL MANAGER ERROR
+       | SCM error
+       | DANGER: ⚠️ Service gagal start
+
+7001   | SERVICE DEPENDENCY FAILED
+       | Dependency service gagal
+       | DANGER: ⚠️ Service butuh dependency yang gagal start
+
+7002   | SERVICE CONTROL MANAGER EVENT
+       | SCM event
+       | DANGER: ⚠️ Error penting
+
+7031   | SERVICE CRASHED
+       | Service crash
+       | DANGER: ⚠️ Kombinasi banyak = SUSPICIOUS
+
+7034   | SERVICE TERMINATED UNEXPECTEDLY
+       | Service terminate tidak expected
+       | DANGER: ⚠️ Bisa indicate malware
+
+🟢 LOW / INFO
+---------------------------------------------------------------------------
+7009   | SERVICE CONTROL MANAGER TIMEOUT
+       | SCM timeout waiting for service
+
+7011   | SERVICE CONTROL REQUEST TIMEOUT
+       | Timeout waiting for service response
+
+7022   | SERVICE START OPERATION HUNG
+       | Service start operation hung
+
+7023   | SERVICE STOPPED WITH ERRORS
+       | Service stopped due to error
+
+7038   | SERVICE ACCOUNT CHANGED
+       | Service account changed
+
+7044   | SERVICE DELETE FAILED
+       | Service deletion failed
+
+================================================================================
+================================================================================
+APPLICATION LOG - APP CRASH & HANG EVENTS
+================================================================================
+CATEGORY: Application
+================================================================================
+
+🟠 HIGH
+---------------------------------------------------------------------------
+1000   | APPLICATION ERROR
+       | App crash
+       | DANGER: ⚠️ Catat: App name + crash address
+       | exe yang crash, offset address
+       | Bisa indicate exploitation
+
+1001   | APPLICATION HANG
+       | App hang
+       | DANGER: ⚠️ Bisa indicate exploitation
+
+1074   | APPLICATION/SERVICE SHUTDOWN
+       | App/service shutdown by user/system
+       | DANGER: ⚠️ Baseline: siapa shutdown, kapan, alasan
+
+1076   | UNEXPECTED SHUTDOWN
+       | User pilih shutdown unexpectedly
+       | DANGER: ⚠️ Baseline untuk user behavior
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+1517   | USER PROFILE ARCHIVED
+       | Profile di-archive (cleanup)
+       | DANGER: Normal profile cleanup
+
+1518   | USER PROFILE HANDLE VALIDATION
+       | Profile handle validated
+       | DANGER: Baseline operation
+
+1519   | USER PROFILE LOADED
+       | Profile loaded
+       | DANGER: Normal login process
+
+1524   | USER PROFILE UNLOADED
+       | Profile unloaded
+       | DANGER: Normal logout process
+
+================================================================================
+================================================================================
+POWERSHELL LOGGING - SCRIPT BLOCK & EXECUTION EVENTS
+================================================================================
+CATEGORY: Microsoft-Windows-PowerShell/Operational
+REQUIRED: Enable Script Block Logging & Module Logging
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4103   | MODULE LOGGING - SCRIPT BLOCKS EXECUTED
+       | PowerShell execute script block
+       | DANGER: ⚠️ Deteksi ENCODED COMMAND, malicious scripts
+       | Level: Verbose
+       | Path: Runspace ID, Script Name, Command
+       | ATT&CK: T1059.001 - PowerShell Attack
+       |
+       | # Wazuh Rule Example:
+       | <rule id="100250" level="12">
+       |   <match>EncodedCommand</match>
+       |   <description>PowerShell Encoded Command Detected</description>
+       | </rule>
+
+4104   | SCRIPT BLOCK LOGGING - HIGH VERBOSITY
+       | Script block executed (high verbosity)
+       | DANGER: ⚠️ ATT&CK T1059.001 - PowerShell attack
+       | Contains full script content
+       | Best for: hunting malicious scripts
+       |
+       | # Suspicious patterns to alert:
+       | - -enc (encoded commands)
+       | - DownloadString / DownloadFile
+       | - Invoke-Expression / IEX
+       | - New-Object System.Net
+       | - http:// / https:// in scripts
+
+🟠 HIGH
+---------------------------------------------------------------------------
+8004   | PROVIDER LIFECYCLE EVENT
+       | Provider started/stopped
+       | DANGER: Baseline untuk powershell operation
+
+⚪ INFO (Normal Activity)
+---------------------------------------------------------------------------
+400     | ENGINE LIFECYCLE
+       | PowerShell engine start
+       | DANGER: Baseline, kapan PS dimulai
+
+4010   | ENGINE SHUTDOWN
+       | PowerShell engine shutdown
+       | DANGER: Baseline
+
+403    | EXECUTION STOPPED
+       | PowerShell execution stopped
+
+600     | PROVIDER LIFECYCLE
+       | Provider started
+
+8193   | MODULE LOGGING STARTED
+       | Module logging enabled
+
+8194   | MODULE LOGGING STOPPED
+       | Module logging disabled
+
+================================================================================
+HOW TO ENABLE POWERSHELL LOGGING
+================================================================================
+
+VIA GROUP POLICY (gpedit.msc):
+---------------------------------------------------------------------------
+Computer Configuration >
+  Administrative Templates >
+    Windows Components >
+      Windows PowerShell >
+        Turn on Module Logging = Enabled
+        Module Names = *
+
+        Turn on Script Block Logging = Enabled
+        Script Block Invocation Start = Enabled
+        Script Block Invocation Start = Enabled
+
+VIA REGISTRY (PowerShell Admin):
+---------------------------------------------------------------------------
+# Enable Module Logging
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging" /v EnableModuleLogging /t REG_DWORD /d 1
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames" /v * /t REG_SZ /d *
+
+# Enable Script Block Logging
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" /v EnableScriptBlockLogging /t REG_DWORD /d 1
+
+================================================================================
+WAZUH CONFIG FOR POWERSHELL LOGS
+================================================================================
+
+<ossec_config>
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-PowerShell/Operational</location>
+  </localfile>
+</ossec_config>
+
+================================================================================
+================================================================================
+RDP LOGGING - REMOTE DESKTOP SESSION EVENTS
+================================================================================
+CATEGORY: Security
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4624   | RDP SESSION LOGIN SUCCESS
+       | Type 10 = RemoteInteractive (RDP)
+       | DANGER: ⚠️ Baseline: catat SOURCE IP untuk RDP
+       | Logon Type 10 indicates RDP
+       | Source IP penting untuk detect unauthorized RDP
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4648   | EXPLICIT CREDENTIALS USED (RDP)
+       | RDP with explicit credentials
+       | DANGER: ⚠️ Could be RDP HIJACKING
+       | Siapa, credentials mana, dari mana
+
+4778   | SESSION RECONNECTED
+       | User reconnect ke existing RDP
+       | DANGER: ⚠️ Perhatikan WAKTU dan SOURCE IP
+       | Kombinasi unusual = suspicious
+
+4779   | SESSION DISCONNECTED
+       | RDP session disconnect
+       | DANGER: ⚠️ Kadang legitimate, kadang ATTACKER disconnect victim
+       | Attacker kadang disconnect victim untuk takeover session
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+1149   | RDP USER AUTHENTICATION
+       | User authenticated via RDP
+       | DANGER: Baseline RDP connection
+       | Source IP, username
+
+🟢 LOW / INFO
+---------------------------------------------------------------------------
+1102   | AUDIT LOG CLEARED
+       | RDP session log cleared
+       | DANGER: ⚠️ Indicates cover tracks
+
+================================================================================
+HOW TO ENABLE RDP LOGGING
+================================================================================
+
+VIA GROUP POLICY:
+---------------------------------------------------------------------------
+Computer Configuration >
+  Administrative Templates >
+    Windows Components >
+      Remote Desktop Services >
+        Remote Session Environment >
+          Configure keep-alive connection interval = Enabled
+
+        Session Time Limits >
+          Set time limit for disconnected sessions = Enabled
+          End session when time limits reached
+
+VIA SECURITY POLICY (secpol.msc):
+---------------------------------------------------------------------------
+Local Policies >
+  Audit Policy >
+    Logon: Audit Credential Validation = Success + Failure
+
+VIA REGISTRY:
+---------------------------------------------------------------------------
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v AuditLogon /t REG_DWORD /d 1
+
+================================================================================
+WAZUH CONFIG FOR RDP LOGS
+================================================================================
+
+<!-- Monitor Security log for RDP events -->
+<ossec_config>
+  <localfile>
+    <log_format>eventlog</log_format>
+    <location>Security</location>
+  </localfile>
+</ossec_config>
+
+<!-- Or via eventchannel for more detail -->
+<ossec_config>
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-TerminalServices-RDPClient/Operational</location>
+  </localfile>
+</ossec_config>
+
+================================================================================
+================================================================================
+WINDOWS DEFENDER / SECURITY CENTER EVENTS
+================================================================================
+CATEGORY: Microsoft-Windows-Windows Defender/Operational
+REQUIRED: Windows Defender or 3rd party AV
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+1116   | MALWARE PROTECTION - DETECTION
+       | Windows Defender mendeteksi MALWARE
+       | DANGER: ⚠️ MALWARE FOUND - action needed
+       | Field: Threat Name, Threat ID, Severity, Path, Detection Time
+       | Action: Quarantine / Remove / Allow
+
+1117   | MALWARE PROTECTION - ACTION TAKEN
+       | Windows Defender mengambil ACTION
+       | DANGER: ⚠️ CATAT: malware name, action taken, file path
+       | Actions: Clean, Quarantine, Remove, Block
+
+🟠 HIGH
+---------------------------------------------------------------------------
+1000   | ANTIVIRUS - DETECTION
+       | Antivirus (non-Defender) detected
+       | DANGER: ⚠️ Malware detected
+       | Catat: Signature, File, Action
+
+1001   | ANTIVIRUS - SIGNATURE UPDATE
+       | Antivirus signature update
+       | DANGER: Baseline: kapan update, apakah berhasil
+       | Catat: Old version, New version, Update result
+
+1121   | REAL-TIME PROTECTION - STATISTICS
+       | Real-time protection stats
+
+1124   | ANTIVIRUS - ENGINE HUNG
+       | Antivirus engine hung
+
+1125   | ANTIVIRUS - ENGINE NOT RESPONDING
+       | Antivirus engine not responding
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+1002   | ANTIVIRUS - SIGNATURE UPDATE FAILED
+       | Signature update failed
+       | DANGER: ⚠️ AV bisa tidak updated
+
+1010   | ANTIVIRUS - SCAN CANCELLED
+       | Antivirus scan cancelled
+
+1015   | ANTIVIRUS - SIGNATURE REVERSION
+       | Signature reverted to previous version
+       | DANGER: ⚠️ Suspicious - why?
+
+================================================================================
+HOW TO ENABLE DEFENDER LOGGING
+================================================================================
+
+VIA POWERSHELL:
+---------------------------------------------------------------------------
+# Enable Windows Defender logging
+wevtutil sl "Microsoft-Windows-Windows Defender/Operational" /ms:104857600
+
+# Set log to retain 30 days
+wevtutil sl "Microsoft-Windows-Windows Defender/Operational" /rt:true /ab:true /ms:104857600
+
+VIA WAZUH CONFIG:
+---------------------------------------------------------------------------
+<ossec_config>
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-Windows Defender/Operational</location>
+  </localfile>
+</ossec_config>
+
+================================================================================
+================================================================================
+WMI ACTIVITY LOGGING - LATERAL MOVEMENT DETECTION
+================================================================================
+CATEGORY: Microsoft-Windows-WMI-Activity/Operational
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+5857   | WMI ACTIVITY - FILTER, CONSUMER, BINDING
+       | WMI activity detected
+       | DANGER: ⚠️ ATT&CK T1047 - Windows Management Instrumentation
+       | Indicates lateral movement via WMI
+       | Who, What, Where, When
+
+5858   | WMI ACTIVITY - PERMANENT EVENT CONSUMER
+       | Permanent event consumer created/modified
+       | DANGER: ⚠️ ATT&CK T1543.003 - Persistence via WMI
+       | Consumer: CommandLineEventConsumer (runs command)
+       | Filter: __EventFilter (trigger condition)
+
+🟠 HIGH
+---------------------------------------------------------------------------
+5859   | WMI ACTIVITY - CONSUMER STARTED
+       | Event consumer started
+       | DANGER: Baseline untuk legitimate WMI
+
+5860   | WMI ACTIVITY - FILTER UNBOUND
+       | Filter unbound from consumer
+       | DANGER: Baseline operation
+
+5861   | WMI ACTIVITY - CONSUMER DISMISSED
+       | Consumer dismissed
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+5858   | WMI PERMANENT EVENT CONSUMER
+       | Consumer that executes commands
+       | DANGER: ⚠️ Alert if CommandLineEventConsumer
+       | Common for: malware persistence, lateral movement
+
+================================================================================
+HOW TO ENABLE WMI LOGGING
+================================================================================
+
+VIA GROUP POLICY:
+---------------------------------------------------------------------------
+Computer Configuration >
+  Administrative Templates >
+    Windows Components >
+      Windows Remote Management (WinRM) >
+        WinRM Service >
+          Allow remote server management through WinRM = Enabled
+
+VIA POWERSHELL (Admin):
+---------------------------------------------------------------------------
+# Enable WMI Activity logging
+wevtutil sl "Microsoft-Windows-WMI-Activity/Operational" /ms:52428800 /rt:true /ab:true
+
+VIA WAZUH CONFIG:
+---------------------------------------------------------------------------
+<ossec_config>
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-WMI-Activity/Operational</location>
+  </localfile>
+</ossec_config>
+
+================================================================================
+SUSPICIOUS WMI PATTERNS
+================================================================================
+
+ALERT if:
+- CommandLineEventConsumer with suspicious commands
+- Consumer modified outside maintenance windows
+- New permanent consumers on servers
+- WMI activity from service accounts
+
+================================================================================
+================================================================================
+KERBEROS / SPN EVENTS - TICKET-BASED AUTHENTICATION
+================================================================================
+CATEGORY: Security
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4768   | TGT REQUESTED (Kerberos TGT)
+       | Ticket Granting Ticket requested
+       | DANGER: ⚠️ Baseline: catat per user dan service account
+       | Alert if: unusual hours, unusual source, unusual frequency
+       | Target: User account, TGT Expiry
+
+4769   | SERVICE TICKET REQUESTED (SPN)
+       | Service Ticket requested
+       | DANGER: ⚠️ Alert if: user/service akses SPN yang tidak biasa
+       | Indicates: Kerberoasting (request TGS for service account)
+       | Target: SPN name, Service type
+
+4770   | SERVICE TICKET RENEWED
+       | Ticket renewed
+       | DANGER: ⚠️ Baseline untuk long-running service
+       | Normal: service accounts dengan long-lived tickets
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4771   | KERBEROS PRE-AUTH FAILURE
+       | Kerberos pre-authentication failed
+       | DANGER: ⚠️ BRUTE FORCE or guess password
+       | Alert if: banyak failure dalam short time
+       | Target: Account, Source IP, Failure reason
+
+4639   | KERBEROS CREDENTIAL CACHED
+       | Ticket cached
+       | DANGER: Baseline untuk login
+
+4640   | KERBEROS CREDENTIAL EXPIRED
+       | Ticket expired
+       | DANGER: Normal expiration
+
+4649   | SPN DOWNTIME DETECTED
+       | Kerberos SPN downgrade attack
+       | DANGER: ⚠️ Could be GOLDEN TICKET attack
+       | Indicates: Kerberos auth bypass attempt
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+4670   | KERBEROS POLICY CHANGED
+       | Kerberos policy changed
+       | DANGER: ⚠️ Siapa mengubah, kapan
+
+4767   | ACCOUNT UNLOCKED
+       | Kerberos account unlocked
+       | DANGER: Baseline untuk lockout policy
+
+4772   | KERBEROS TGT TIMESTAMP UPDATED
+       | Ticket timestamp updated
+       | DANGER: Baseline operation
+
+4773   | KERBEROS SERVICE TICKET EXPIRED
+       | Service ticket expired
+       | DANGER: Normal
+
+4774   | KERBEROS SERVICE TICKET RENEWED
+       | Service ticket renewed
+       | DANGER: Baseline
+
+================================================================================
+KERBEROASTING DETECTION
+================================================================================
+
+ALERT IF:
+- Banyak 4769 untuk service accounts (TGS request)
+- Service accounts dengan SPN yang tidak biasa
+- Request dari source yang tidak biasa
+- Request outside maintenance windows
+
+WAZUH RULE EXAMPLE:
+---------------------------------------------------------------------------
+<rule id="100300" level="10">
+  <match>Service Ticket</match>
+  <description>Kerberoasting - Service Ticket Requested</description>
+  <group>kerberos,threat_detection</group>
+</rule>
+
+================================================================================
+================================================================================
+CREDENTIAL THEFT INDICATORS - RED TEAM DETECTION
+================================================================================
+CATEGORY: Security
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4624   | PASS-THE-HASH (NTLM)
+       | Logon Type 3 (Network) dari source tidak biasa
+       | DANGER: ⚠️ Attacker use hash untuk lateral movement
+       | Alert: user from unexpected source IP
+
+4625   | BRUTE FORCE ATTACK
+       | Banyak login failure
+       | DANGER: ⚠️ ATTACK in progress
+       | Threshold: 5+ failures per 10 min = ALERT
+
+4672   | ADMIN LOGON TO NON-ADMIN ACCOUNT
+       | Admin credentials dipakai ke user biasa
+       | DANGER: ⚠️ ATT&CK T1071.003 - Valid accounts
+       | Indicates: privilege escalation attempt
+
+4649   | SPN DOWNTIME / GOLDEN TICKET
+       | Kerberos downgrade attack
+       | DANGER: ⚠️ Could be GOLDEN TICKET attack
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4688   | PROCESS INJECTION (via Sysmon)
+       | New process dengan access token dimodify
+       | DANGER: ⚠️ ATT&CK T1055 - Process Injection
+       | Parent process suspicious + token modified
+
+4689   | CREDENTIAL DUMPING
+       | Process terminated + memory dump
+       | DANGER: ⚠️ Attacker dump LSASS memory
+       | Parent: lsass.exe, mimikatz, procump
+
+4697   | SECURITY PACKAGE LOADED
+       | Security package loaded
+       | DANGER: ⚠️ Credential theft tool loaded
+       | Packages: WDigest, Kerberos, NTLM
+
+4698   | SCHEDULED TASK FOR CREDENTIAL ACCESS
+       | Task dengan service account credentials
+       | DANGER: ⚠️ ATT&CK T1053 - Scheduled Task
+       | Check task action untuk suspicious commands
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+4674   | SENSITIVE PRIVILEGE USED
+       | Privileged operation oleh process
+       | DANGER: Baseline untuk admin, weird untuk user
+
+4702   | CREDENTIAL MANAGER BACKUP
+       | Credential Manager backup created
+       | DANGER: ⚠️ Attacker backup credentials
+
+4703   | CREDENTIAL MANAGER RESTORE
+       | Credential Manager restore
+       | DANGER: ⚠️ Attacker restore stolen credentials
+
+================================================================================
+COMMON CREDENTIAL THEFT TOOLS
+================================================================================
+
+TOOL        | INDICATOR
+------------|--------------------------------------------
+Mimikatz    | lsass.exe access, sekurlsa::logonpasswords
+Procdump    | lsass.exe dump file created
+Mimipenguin | Linux credential dump
+WCE         | Windows Credentials Editor
+Mimikatz    | kerberos::golden, sekurlsa::pth
+
+================================================================================
+WAZUH RULES FOR CREDENTIAL THEFT
+================================================================================
+
+<rule id="100400" level="12">
+  <match>lsass|mimikatz|procdump|cmdkey</match>
+  <description>Credential Theft Tool Detected</description>
+  <group>credential_theft,malware</group>
+</rule>
+
+<rule id="100401" level="10">
+  <match>sekurlsa|logonpasswords|kerberos::golden</match>
+  <description>Mimikatz Activity Detected</description>
+  <group>credential_theft,mimikatz</group>
+</rule>
+
+================================================================================
+================================================================================
+PROCESS CREATION EVENTS - EXECUTION DETECTION
+================================================================================
+CATEGORY: Security (4688) + Sysmon (1)
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4688   | PROCESS CREATED
+       | New process dibuat
+       | DANGER: ⚠️ Command line EXECUTION indicator
+       | Field: NewProcessName, ParentProcessName, CommandLine, User
+       | ATT&CK: T1059 - Command and Scripting Interpreter
+       |
+       | IMPORTANT: Command line mengandung INDICATION
+       | Alert if:
+       | - suspicious.exe + suspicious arguments
+       | - cmd.exe / powershell.exe + encoded commands
+       | - Parent process unusual
+
+4689   | PROCESS TERMINATED
+       | Process dihentikan
+       | DANGER: ⚠️ Bisa indicate malware removal
+       | Catat: Process name, who terminated
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4697   | SERVICE INSTALLED (via process)
+       | Service diinstall via process
+       | DANGER: ⚠️ ATT&CK T1543.003 - Windows Service
+
+4698   | SCHEDULED TASK CREATED
+       | Task baru dibuat via process
+       | DANGER: ⚠️ ATT&CK T1053 - Scheduled Task
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+4699   | WINDOWS SERVICE CREATED
+       | Service baru dibuat
+       | DANGER: Baseline untuk legitimate service install
+
+4700   | WINDOWS SERVICE DELETED
+       | Service dihapus
+       | DANGER: ⚠️ Attacker delete service untuk cover tracks
+
+4701   | WINDOWS SERVICE CHANGED
+       | Service configuration changed
+       | DANGER: ⚠️ Attacker modify service untuk malicious purpose
+
+4702   | SCHEDULED TASK UPDATED
+       | Task configuration changed
+       | DANGER: ⚠️ Attacker modify task
+
+================================================================================
+SUSPICIOUS PROCESS COMMAND LINES
+================================================================================
+
+ALERT IF PROCESS + COMMAND LINE CONTAINS:
+---------------------------------------------------------------------------
+- powershell.exe -enc [base64]
+- powershell.exe -EncodedCommand [base64]
+- cmd.exe /c [command]
+- mshta.exe [url/script]
+- regsvr32.exe [scrobj.dll]
+- rundll32.exe [dll,function]
+- certutil.exe -decode [encoded]
+- bitsadmin.exe [transfer]
+- wmic.exe process call create [command]
+- schtasks.exe /create /tn [task] /tr [command]
+
+================================================================================
+WAZUH RULES FOR PROCESS EXECUTION
+================================================================================
+
+<rule id="100500" level="10">
+  <match>powershell.exe -enc</match>
+  <description>PowerShell Encoded Command Detected</description>
+  <group>execution,powershell,malware</group>
+</rule>
+
+<rule id="100501" level="10">
+  <match>mshta.exe|rundll32.exe</match>
+  <description>Suspicious Process Execution</description>
+  <group>execution,defense_evasion</group>
+</rule>
+
+================================================================================
+================================================================================
+SCHEDULED TASK EVENTS - PERSISTENCE MECHANISM
+================================================================================
+CATEGORY: Security
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+4698   | SCHEDULED TASK CREATED
+       | Task baru dibuat
+       | DANGER: ⚠️ ATT&CK T1053.005 - Scheduled Task (Windows)
+       | Attacker pakai ini untuk PERSISTENCE
+       | Field: Task Name, Task Content, Author
+       | Alert if: task dari user biasa, unusual time, suspicious command
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4699   | SCHEDULED TASK DELETED
+       | Task dihapus
+       | DANGER: ⚠️ Attacker hapus task untuk cleanup
+
+4700   | WINDOWS SERVICE CREATED
+       | Service baru dibuat
+       | DANGER: ⚠️ ATT&CK T1543.003 - Windows Service
+
+4701   | WINDOWS SERVICE CHANGED
+       | Service configuration changed
+       | DANGER: ⚠️ Attacker modify service configuration
+
+4702   | SCHEDULED TASK UPDATED
+       | Task configuration changed
+       | DANGER: ⚠️ Attacker modify existing task
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+4697   | SERVICE INSTALLED
+       | Service baru diinstall via SFC
+       | DANGER: Baseline legitimate software install
+
+1100   | TASK SCHEDULER SERVICE
+       | Task Scheduler service event
+       | DANGER: Baseline service operation
+
+1101   | TASK SCHEDULER CONFIG
+       | Task Scheduler configuration changed
+       | DANGER: ⚠️ Siapa ubah, kapan
+
+================================================================================
+ATTACKER SCHEDULED TASK PATTERNS
+================================================================================
+
+ALERT IF:
+- Task created by user (not SYSTEM/admin)
+- Task runs outside business hours
+- Task runs from temp directory
+- Task runs suspicious commands (powershell, cmd, certutil)
+- Task with hidden/mods privilege
+- Task without author (attacker removed)
+
+COMMON MALICIOUS TASK LOCATIONS:
+---------------------------------------------------------------------------
+C:\Windows\System32\Tasks\
+C:\Windows\SysWOW64\Tasks\
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks\
+HKCU\Software\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks\
+
+================================================================================
+WAZUH RULES FOR SCHEDULED TASK
+================================================================================
+
+<rule id="100600" level="10">
+  <match>Task Scheduler|TaskCache|TaskXML</match>
+  <description>Scheduled Task Activity Detected</description>
+  <group>persistence,scheduled_task</group>
+</rule>
+
+<rule id="100601" level="12">
+  <match>schtasks.exe /create /tn.*/tr.*powershell</match>
+  <description>Suspicious Scheduled Task with PowerShell</description>
+  <group>persistence,powershell,mimikatz</group>
+</rule>
+
+================================================================================
+================================================================================
+NETWORK SHARE & SMB EVENTS - FILE SHARE ACCESS
+================================================================================
+CATEGORY: Security + Microsoft-Windows-SMBServer/Audit
+================================================================================
+
+🔴 CRITICAL
+---------------------------------------------------------------------------
+5140   | NETWORK SHARE OBJECT ACCESSED
+       | File share accessed
+       | DANGER: ⚠️ WHO accessed WHAT file via network
+       | Field: Subject, Share Name, Object Type, Access Mask
+       | Alert if: unusual user, unusual share, unusual time
+
+5142   | NETWORK SHARE CREATED
+       | Share baru dibuat
+       | DANGER: ⚠️ Attacker buat share untuk EXFILTRATION
+       | Field: Share Name, Path, Remark, Permissions
+
+5143   | NETWORK SHARE MODIFIED
+       | Share configuration modified
+       | DANGER: ⚠️ Attacker modify share untuk akses
+
+5144   | FILE SHARE CHANGED
+       | Share permissions changed
+       | DANGER: ⚠️ Attacker ubah permissions untuk akses
+
+🟠 HIGH
+---------------------------------------------------------------------------
+4624   | SMB SESSION ESTABLISHED
+       | SMB connection (audit file access)
+       | DANGER: Baseline untuk network login
+       | Logon Type 3 = Network
+
+4670   | OBJECT PERMISSIONS CHANGED (share)
+       | Permissions objek berubah
+       | DANGER: ⚠️ Attacker modify permissions
+
+🟡 MEDIUM
+---------------------------------------------------------------------------
+4670   | SHARING PERMISSIONS CHANGED
+       | Object sharing permissions changed
+       | DANGER: ⚠️ Siapa ubah, kapan
+
+4688   | SMB PROCESS CREATION
+       | Process created via SMB
+       | DANGER: Baseline
+
+4693   | BACKUP OPERATION
+       | Backup operation initiated
+       | DANGER: ⚠️ Bisa indicate data exfiltration
+
+4694   | CLUSTER FAILURE
+       | Cluster operation failed
+       | DANGER: Baseline
+
+================================================================================
+WAZUH CONFIG FOR SMB LOGGING
+================================================================================
+
+Enable SMB Audit in Windows:
+---------------------------------------------------------------------------
+auditpol /set /subcategory:"File System" /success:enable /failure:enable
+auditpol /set /subcategory:"File Share" /success:enable /failure:enable
+auditpol /set /subcategory:"Removable Storage" /success:enable /failure:enable
+
+WAZUH CONFIG:
+---------------------------------------------------------------------------
+<ossec_config>
+  <localfile>
+    <log_format>eventlog</log_format>
+    <location>Security</location>
+  </localfile>
+</ossec_config>
+
+================================================================================
+================================================================================
+QUICK REFERENCE - WINDOWS EVENT IDs PENTING
+================================================================================
+
+🔴 CRITICAL - Respons Segera
+🟠 HIGH - Investigasi
+🟡 MEDIUM - Baseline / Corelasi
+
+================================================================================
+SECURITY - ACCOUNT & AUTHENTICATION
+================================================================================
+
+🔴 4624 | LOGON SUCCESS | Baseline legitimate login
+🔴 4625 | LOGON FAILURE | ⚠️ BRUTE FORCE ATTACK
+🔴 4672 | SPECIAL PRIVILEGES | Admin assignment
+🔴 4719 | AUDIT POLICY CHANGED | ⚠️ LOG TAMPERING
+
+🟠 4648 | EXPLICIT CREDENTIALS | ⚠️ LATERAL MOVEMENT
+🟠 4670 | OBJECT PERMISSIONS | Permissions changed
+🟠 4720 | ACCOUNT CREATED | ⚠️ PERSISTENCE
+🟠 4722 | ACCOUNT ENABLED | Account enabled
+🟠 4723 | PASSWORD CHANGE | Password change attempt
+🟠 4724 | PASSWORD RESET | Password reset attempt
+🟠 4732 | MEMBER ADDED TO GROUP | ⚠️ PRIVILEGE ESCALATION
+🟠 4740 | ACCOUNT LOCKED | Brute force lockout
+
+================================================================================
+SECURITY - KERBEROS
+================================================================================
+
+🔴 4768 | TGT REQUESTED | Kerberos TGT requested
+🔴 4769 | SPN ACCESSED | ⚠️ KERBEROASTING
+🟠 4771 | PRE-AUTH FAILURE | Kerberos brute force
+
+================================================================================
+SECURITY - CREDENTIAL THEFT
+================================================================================
+
+🔴 4649 | SPN DOWNTIME | ⚠️ GOLDEN TICKET
+🟠 4697 | SERVICE INSTALLED | ⚠️ PERSISTENCE
+🟠 4702 | CREDENTIAL BACKUP | Credential backup
+
+================================================================================
+PROCESS & EXECUTION
+================================================================================
+
+🔴 4688 | PROCESS CREATED | ⚠️ EXECUTION indicator
+🟠 4689 | PROCESS TERMINATED | Process stopped
+
+================================================================================
+PERSISTENCE MECHANISM
+================================================================================
+
+🔴 4698 | SCHEDULED TASK CREATED | ⚠️ ATT&CK T1053
+🟠 4699 | SCHEDULED TASK DELETED | Task removed
+🟠 4700 | WINDOWS SERVICE CREATED | Service created
+🟠 4701 | WINDOWS SERVICE CHANGED | Service modified
+
+================================================================================
+POWERSHELL & SCRIPTING
+================================================================================
+
+🔴 4103 | MODULE LOGGING | ⚠️ ENCODED COMMAND
+🔴 4104 | SCRIPT BLOCK | ⚠️ MALICIOUS SCRIPT
+
+================================================================================
+SYSTEM & SERVICE
+================================================================================
+
+🔴 6008 | UNEXPECTED SHUTDOWN | ⚠️ RANSOMWARE?
+🔴 1040 | AUDIT LOG CLEARED | ⚠️ LOG TAMPERING
+
+🟠 6005 | EVENT LOG STARTED | Log service started
+🟠 6006 | EVENT LOG STOPPED | ⚠️ LOG CLEARING
+🟠 7045 | SERVICE INSTALLED | ⚠️ MALWARE PERSISTENCE
+🟠 7030 | SERVICE CRASHED | Service crashed
+
+================================================================================
+RDP
+================================================================================
+
+🔴 4624 | RDP LOGIN (Type 10) | Remote Desktop login
+🟠 4778 | SESSION RECONNECTED | RDP reconnect
+🟠 4779 | SESSION DISCONNECTED | RDP disconnect
+
+================================================================================
+DEFENDER / ANTIVIRUS
+================================================================================
+
+🔴 1116 | MALWARE DETECTION | Malware found!
+🔴 1117 | MALWARE ACTION | ⚠️ Action taken
+
+================================================================================
+WMI (LATERAL MOVEMENT)
+================================================================================
+
+🔴 5857 | WMI ACTIVITY | ⚠️ WMI ACTIVITY
+🔴 5858 | PERMANENT CONSUMER | ⚠️ WMI PERSISTENCE
+
+================================================================================
+NETWORK / SMB / FILE SHARE
+================================================================================
+
+🟠 5140 | SHARE ACCESSED | Share accessed
+🟠 5142 | SHARE CREATED | ⚠️ SHARE CREATED
+🟠 5144 | SHARE CHANGED | ⚠️ PERMISSIONS CHANGED
+
+================================================================================
+QUICK ALERT RULES
+================================================================================
+
+WAZUH QUICK ALERTS:
+---------------------------------------------------------------------------
+4625 + source IP sama + >5x = BRUTE FORCE
+4624 + user biasa + privileged group = PRIVILEGE ESCALATION
+4698 + suspicious command = MALICIOUS TASK
+4103/4104 + encoded = MALICIOUS POWERSHELL
+1040 + 6006 = LOG TAMPERING
+1116/1117 = MALWARE DETECTION
+
+================================================================================

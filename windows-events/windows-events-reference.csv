@@ -1,0 +1,4 @@
+EventID;Category;DangerLevel;Name;Description;WazuhAgentConfig;SplunkUFConfig
+4624;Security;CRITICAL;Logon Success;User login berhasil;<localfile><log_format>eventlog</log_format><location>Security</location></localfile>;[WinEventLog://Security]
+disabled = false
+index = windows

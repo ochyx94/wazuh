@@ -1,0 +1,117 @@
+# WAZUH SIEM INSTALL LOG
+# ======================
+# Tanggal: 02 September 2026
+# Sistem: Windows 10 WSL Ubuntu
+# Versi Wazuh: 4.14 (latest)
+# Hardware: 16GB RAM, i7-9750H
+# WSL Config: 3 core, 6GB RAM, 8GB swap
+
+================================================================================
+LANGKAH 1: SETUP .wslconfig (Windows)
+================================================================================
+File: %USERPROFILE%\.wslconfig
+
+[ISI FILE]
+[wsl2]
+memory=6GB
+processors=3
+swap=8GB
+localhostForwarding=true
+
+[Aksi di PowerShell]
+wsl --shutdown
+
+STATUS: ✅ BERHASIL
+
+================================================================================
+LANGKAH 2: UPDATE UBUNTU
+================================================================================
+[KODE]
+sudo apt update && sudo apt upgrade -y
+
+STATUS: ✅ BERHASIL
+
+================================================================================
+LANGKAH 3: INSTALL DEPENDENCIES
+================================================================================
+[KODE]
+sudo apt install -y curl apt-transport-https gnupg
+
+STATUS: ✅ BERHASIL
+
+================================================================================
+LANGKAH 4: DOWNLOAD & INSTALL WAZUH v4.14
+================================================================================
+[KODE]
+curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh
+chmod +x wazuh-install.sh
+sudo bash wazuh-install.sh -a
+
+[Waktu Install] ~15-20 menit
+
+[OUTPUT SUKSES]
+02/09/2026 14:57:48 INFO: You can access the web interface https://<wazuh-dashboard-ip>:443
+02/09/2026 14:57:48 INFO: User: admin
+02/09/2026 14:57:48 INFO: Password: Y6r4ruC.l*f8eXCbgGcfr?1eOAce?yyH
+02/09/2026 14:57:48 INFO: Installation finished.
+
+STATUS: ✅ BERHASIL
+
+================================================================================
+LANGKAH 5: SIMPAN CREDENTIALS
+================================================================================
+URL Dashboard: https://localhost:443
+Username:     admin
+Password:     Y6r4ruC.l*f8eXCbgGcfr?1eOAce?yyH
+
+STATUS: ✅ TERSIMPAN
+
+================================================================================
+LANGKAH 6: AKSES DASHBOARD
+================================================================================
+[URL] https://localhost:443
+
+[Langkah]
+1. Buka Chrome/Edge di Windows
+2. Kunjungi https://localhost:443
+3. Klik "Advanced" → "Proceed to localhost (unsafe)"
+4. Login dengan credentials dari Langkah 5
+
+STATUS: ✅ BERHASIL
+
+================================================================================
+KOMPONEN TERINSTALL
+================================================================================
+- Wazuh Manager    : Port 1514, 1515 (agent management)
+- Wazuh Indexer    : Port 9200 (Elasticsearch fork, indexing)
+- Wazuh Dashboard  : Port 443 (Kibana fork, UI)
+- Filebeat         : Log forwarder
+
+================================================================================
+BASH VERIFIKASI SERVICE (OPSIONAL)
+================================================================================
+sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard
+sudo ss -tlnp | grep -E '9200|5601|1514|1515'
+
+================================================================================
+TEST SIEM (OPSIONAL)
+================================================================================
+Dashboard → Threat Detection → Log Test
+
+Sample log test:
+Feb 14 12:00:00 myserver sshd[1234]: Accepted password for root from 192.168.1.100 port 22 ssh2
+
+================================================================================
+CATATAN PERMASALAHAN
+================================================================================
+[Disable Auto-Update]
+Ubuntu pakai apt bukan yum.
+File /etc/yum.repos.d/wazuh.repo tidak ada.
+
+Solusi yang work:
+  sudo mv /etc/apt/sources.list.d/wazuh.list /etc/apt/sources.list.d/wazuh.list.bak
+  sudo apt update
+
+================================================================================
+STATUS AKHIR: ✅ SELESAI
+Tanggal Selesai: 02/09/2026 14:57:48

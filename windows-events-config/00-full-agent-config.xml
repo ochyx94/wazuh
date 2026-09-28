@@ -1,0 +1,369 @@
+================================================================================
+WAZUH AGENT CONFIG - SEMUA KATEGORI (MERGED)
+================================================================================
+Monitor: Windows Event Logs untuk SIEM
+================================================================================
+
+<!-- ============================================================
+     SECURITY LOG - Account, Logon, Privilege
+     Event IDs: 4624, 4625, 4634, 4648, 4670, 4672, 4719, 4720-4738, 4740, 4765, 4767, 4778, 4779
+     ============================================================ -->
+<ossec_config>
+  <localfile>
+    <log_format>eventlog</log_format>
+    <location>Security</location>
+  </localfile>
+
+  <!-- ============================================================
+       SYSTEM LOG - Service, Shutdown, Policy
+       Event IDs: 6005, 6006, 6008, 7000, 7030, 7036, 7040, 7045, 1001, 1040
+       ============================================================ -->
+  <localfile>
+    <log_format>eventlog</log_format>
+    <location>System</location>
+  </localfile>
+
+  <!-- ============================================================
+       APPLICATION LOG - App Crash, Hang
+       Event IDs: 1000, 1001, 1074, 1076
+       ============================================================ -->
+  <localfile>
+    <log_format>eventlog</log_format>
+    <location>Application</location>
+  </localfile>
+
+  <!-- ============================================================
+       POWERSHELL LOGGING - Script Block & Module Logging
+       Event IDs: 400, 403, 4103, 4104, 4010, 600, 8004, 8193, 8194
+       REQUIREMENT: Enable Script Block & Module Logging di Windows
+       ============================================================ -->
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-PowerShell/Operational</location>
+  </localfile>
+
+  <!-- ============================================================
+       WMI ACTIVITY LOGGING - Lateral Movement Detection
+       Event IDs: 5857, 5858, 5859, 5860, 5861
+       ============================================================ -->
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-WMI-Activity/Operational</location>
+  </localfile>
+
+  <!-- ============================================================
+       WINDOWS DEFENDER / ANTIVIRUS
+       Event IDs: 1116, 1117, 1000, 1001, 1002, 1010, 1121
+       ============================================================ -->
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-Windows Defender/Operational</location>
+  </localfile>
+
+  <!-- ============================================================
+       RDP CLIENT LOGGING (Optional)
+       ============================================================ -->
+  <localfile>
+    <log_format>eventchannel</log_format>
+    <location>Microsoft-Windows-TerminalServices-RDPClient/Operational</location>
+  </localfile>
+
+</ossec_config>
+
+================================================================================
+HOW TO ENABLE LOGGING DI WINDOWS (JALANKAN SEBAGAI ADMIN)
+================================================================================
+
+--- POWERSHELL LOGGING ---
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging" /v EnableModuleLogging /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames" /v * /t REG_SZ /d * /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" /v EnableScriptBlockLogging /t REG_DWORD /d 1 /f
+
+--- WMI LOGGING ---
+wevtutil sl "Microsoft-Windows-WMI-Activity/Operational" /ms:52428800 /rt:true /ab:true
+
+--- DEFENDER LOGGING ---
+wevtutil sl "Microsoft-Windows-Windows Defender/Operational" /ms:104857600 /rt:true /ab:true
+
+--- RDP LOGGING ---
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v AuditLogon /t REG_DWORD /d 1 /f
+
+--- ENABLE PROCESS CREATION AUDIT (4688) ---
+auditpol /set /subcategory:"Process Creation" /success:enable /failure:enable
+
+--- ENABLE FILE SHARE AUDIT ---
+auditpol /set /subcategory:"File Share" /success:enable /failure:enable
+
+================================================================================
+WAZUH RULES (COPY KE MANAGER: /var/ossec/etc/rules/local_rules.xml)
+================================================================================
+
+<!-- ============================================================
+     SECURITY LOG RULES
+     ============================================================ -->
+
+<!-- Brute Force Detection (4625) -->
+<rule id="100002" level="10">
+  <match>4625</match>
+  <description>Login failed - possible brute force attack</description>
+  <group>authentication_failure,brute_force</group>
+</rule>
+
+<!-- Admin Privileges Assigned (4672) -->
+<rule id="100003" level="10">
+  <match>4672</match>
+  <description>Admin privileges assigned to user</description>
+  <group>privilege_escalation</group>
+</rule>
+
+<!-- Audit Policy Changed (4719) -->
+<rule id="100004" level="12">
+  <match>4719</match>
+  <description>Audit policy changed - possible log tampering</description>
+  <group>tampering,incident</group>
+</rule>
+
+<!-- Account Created (4720) -->
+<rule id="100010" level="10">
+  <match>4720</match>
+  <description>User account created</description>
+  <group>account_creation,persistence</group>
+</rule>
+
+<!-- Account Deleted (4726) -->
+<rule id="100011" level="10">
+  <match>4726</match>
+  <description>User account deleted</description>
+  <group>account_deletion,incident</group>
+</rule>
+
+<!-- Member Added to Group (4732) -->
+<rule id="100012" level="10">
+  <match>4732</match>
+  <description>Member added to security group - possible privilege escalation</description>
+  <group>lateral_movement,privilege_escalation</group>
+</rule>
+
+<!-- Account Locked Out (4740) -->
+<rule id="100013" level="8">
+  <match>4740</match>
+  <description>Account locked out due to brute force</description>
+  <group>brute_force,incident</group>
+</rule>
+
+<!-- RDP Session Reconnect (4778) -->
+<rule id="100014" level="6">
+  <match>4778</match>
+  <description>RDP session reconnected</description>
+  <group>rdp,remote_access</group>
+</rule>
+
+<!-- RDP Session Disconnect (4779) -->
+<rule id="100015" level="6">
+  <match>4779</match>
+  <description>RDP session disconnected</description>
+  <group>rdp,remote_access</group>
+</rule>
+
+<!-- ============================================================
+     SYSTEM LOG RULES
+     ============================================================ -->
+
+<!-- Service Installed (7045) - CRITICAL -->
+<rule id="100100" level="12">
+  <match>7045</match>
+  <description>New service installed - possible malware persistence</description>
+  <group>persistence,malware,incident</group>
+</rule>
+
+<!-- Unexpected Shutdown (6008) - CRITICAL -->
+<rule id="100101" level="12">
+  <match>6008</match>
+  <description>Unexpected system shutdown - possible ransomware</description>
+  <group>incident,ransomware</group>
+</rule>
+
+<!-- Audit Log Cleared (1040) - CRITICAL -->
+<rule id="100102" level="12">
+  <match>1040</match>
+  <description>Audit log cleared - possible log tampering</description>
+  <group>tampering,incident</group>
+</rule>
+
+<!-- Event Log Stopped (6006) -->
+<rule id="100103" level="10">
+  <match>6006</match>
+  <description>Event log service stopped - possible pre-tampering</description>
+  <group>tampering</group>
+</rule>
+
+<!-- Service Crashed (7030, 7031, 7034) -->
+<rule id="100104" level="8">
+  <match>7030|7031|7034</match>
+  <description>Service crashed or terminated unexpectedly</description>
+  <group>system</group>
+</rule>
+
+<!-- ============================================================
+     POWERSHELL LOG RULES
+     ============================================================ -->
+
+<!-- PowerShell Encoded Command - CRITICAL -->
+<rule id="100300" level="12">
+  <match>4103|4104</match>
+  <regex>-enc|-encodedcommand|EncodedCommand</regex>
+  <description>PowerShell encoded command detected</description>
+  <group>execution,powershell,mimikatz,incident</group>
+</rule>
+
+<!-- Suspicious PowerShell Download Pattern -->
+<rule id="100301" level="12">
+  <match>4103|4104</match>
+  <regex>DownloadString|DownloadFile|Invoke-Expression|IEX</regex>
+  <description>Suspicious PowerShell download/execution pattern</description>
+  <group>execution,powershell,malware,incident</group>
+</rule>
+
+<!-- PowerShell Network Activity -->
+<rule id="100302" level="10">
+  <match>4103|4104</match>
+  <regex>http://|https://</regex>
+  <description>PowerShell network activity detected</description>
+  <group>execution,network,powershell</group>
+</rule>
+
+<!-- New-Object System.Net (Suspicious) -->
+<rule id="100303" level="10">
+  <match>4103|4104</match>
+  <regex>New-Object.*System\.Net</regex>
+  <description>PowerShell network object creation</description>
+  <group>execution,powershell</group>
+</rule>
+
+<!-- ============================================================
+     WMI LOG RULES
+     ============================================================ -->
+
+<!-- WMI Activity (5857) - CRITICAL -->
+<rule id="100500" level="12">
+  <match>5857</match>
+  <description>WMI activity detected - possible lateral movement</description>
+  <group>lateral_movement,wmi,incident</group>
+</rule>
+
+<!-- WMI Permanent Event Consumer (5858) - CRITICAL -->
+<rule id="100501" level="12">
+  <match>5858</match>
+  <description>WMI permanent event consumer - possible persistence</description>
+  <group>persistence,wmi,incident</group>
+</rule>
+
+<!-- CommandLineEventConsumer - HIGHLY SUSPICIOUS -->
+<rule id="100502" level="15">
+  <match>5858</match>
+  <regex>CommandLineEventConsumer</regex>
+  <description>WMI CommandLineEventConsumer - highly suspicious activity</description>
+  <group>persistence,wmi,mimikatz,incident</group>
+</rule>
+
+<!-- ============================================================
+     KERBEROS LOG RULES
+     ============================================================ -->
+
+<!-- Service Ticket Requested (4769) - Kerberoasting -->
+<rule id="100601" level="12">
+  <match>4769</match>
+  <description>Kerberos service ticket requested - possible kerberoasting</description>
+  <group>kerberos,threat_detection,incident</group>
+</rule>
+
+<!-- Kerberos Pre-Auth Failure (4771) - Brute Force -->
+<rule id="100603" level="10">
+  <match>4771</match>
+  <description>Kerberos pre-auth failure - possible brute force</description>
+  <group>kerberos,brute_force</group>
+</rule>
+
+<!-- SPN Downgrade (4649) - CRITICAL / Golden Ticket -->
+<rule id="100604" level="15">
+  <match>4649</match>
+  <description>Kerberos SPN downgrade - possible golden ticket attack</description>
+  <group>kerberos,credential_theft,incident</group>
+</rule>
+
+<!-- ============================================================
+     DEFENDER / ANTIVIRUS RULES
+     ============================================================ -->
+
+<!-- Malware Detection (1116) - CRITICAL -->
+<rule id="100800" level="15">
+  <match>1116</match>
+  <description>Windows Defender: Malware detected</description>
+  <group>malware,incident</group>
+</rule>
+
+<!-- Malware Action Taken (1117) - CRITICAL -->
+<rule id="100801" level="15">
+  <match>1117</match>
+  <description>Windows Defender: Action taken on malware</description>
+  <group>malware,incident</group>
+</rule>
+
+<!-- Antivirus Detection (1000) -->
+<rule id="100802" level="12">
+  <match>1000</match>
+  <description>Antivirus: Malware detection</description>
+  <group>malware</group>
+</rule>
+
+<!-- Signature Update Failed (1002) -->
+<rule id="100804" level="10">
+  <match>1002</match>
+  <description>Antivirus: Signature update failed</description>
+  <group>maintenance,security</group>
+</rule>
+
+<!-- ============================================================
+     PROCESS / SCHEDULED TASK RULES
+     ============================================================ -->
+
+<!-- Scheduled Task Created (4698) -->
+<rule id="100400" level="12">
+  <match>4698</match>
+  <description>Scheduled task created - possible persistence</description>
+  <group>persistence,scheduled_task,incident</group>
+</rule>
+
+<!-- Windows Service Created (4700) -->
+<rule id="100402" level="12">
+  <match>4700</match>
+  <description>Windows service created - possible malware persistence</description>
+  <group>persistence,service,incident</group>
+</rule>
+
+<!-- Service Installed (4697) -->
+<rule id="100405" level="8">
+  <match>4697</match>
+  <description>Service installed</description>
+  <group>system,service</group>
+</rule>
+
+================================================================================
+CARA PAKAI:
+================================================================================
+
+1. COPY ossec_config SECTION ke:
+   C:\Program Files (x86)\ossec-agent\ossec.conf
+   (di dalam tag <ossec_config>)
+
+2. COPY RULES ke Manager:
+   /var/ossec/etc/rules/local_rules.xml
+   (di dalam tag <group>)
+
+3. RESTART AGENT:
+   net stop ossec && net start ossec
+
+4. RESTART MANAGER:
+   sudo /var/ossec/bin/ossec-control restart
+
+================================================================================

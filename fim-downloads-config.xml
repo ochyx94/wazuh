@@ -1,0 +1,53 @@
+================================================================================
+FILE INTEGRITY MONITORING - C:\USERS\OK\DOWNLOADS
+================================================================================
+
+TARGET: Windows Agent
+PURPOSE: Monitor folder Downloads secara realtime
+
+================================================================================
+CONFIG ( untuk ossec.conf ):
+================================================================================
+
+<ossec_config>
+  <syscheck>
+    <!-- Monitor Downloads folder -->
+    <directories check_all="yes" realtime="yes">C:\Users\ok\Downloads</directories>
+
+    <!-- Ignore temporary/download files -->
+    <ignore type="sregex">\.tmp$</ignore>
+    <ignore type="sregex">\.crdownload$</ignore>
+    <ignore type="sregex">\.part$</ignore>
+    <ignore type="sregex">\.partial$</ignore>
+  </syscheck>
+</ossec_config>
+
+================================================================================
+CARA APPLY:
+================================================================================
+
+1. Edit file: C:\Program Files (x86)\ossec-agent\ossec.conf
+2. Cari section <syscheck>
+3. Ganti/tambahkan dengan config di atas
+4. Restart agent:
+
+   net stop ossec
+   net start ossec
+
+================================================================================
+VERIFIKASI:
+================================================================================
+
+1. Buka https://localhost:443
+2. Menu: Security Events
+3. Filter: "C:\\Users\\ok\\Downloads"
+
+================================================================================
+ALERT RULES:
+================================================================================
+
+rule.id: 554 = file added
+rule.id: 550 = file modified
+rule.id: 553 = file deleted
+
+================================================================================
