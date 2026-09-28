@@ -53,7 +53,7 @@ Pilih agent ID yang baru dibuat, lalu **copy key** yang muncul.
 **Paste URL ini langsung di browser:**
 
 ```
-https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.8-1.msi
+https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.7-1.msi
 ```
 
 File akan langsung ter-download.
@@ -184,7 +184,7 @@ Restart-Service -Name "WazuhSvc"
 type "C:\Program Files (x86)\ossec-agent\ossec.log"
 
 # Uninstall
-msiexec /x wazuh-agent-4.14.8-1.msi /qn
+msiexec /x wazuh-agent-4.14.7-1.msi /qn
 ```
 
 ---
