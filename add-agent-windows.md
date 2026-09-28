@@ -48,9 +48,9 @@ File akan langsung ter-download.
 
 ## Langkah 4: Konfigurasi via GUI
 
-1. Buka **Wazuh Agent** dari Start Menu:
+1. Buka **Wazuh Agent GUI**:
    ```
-   Start → Wazuh → Wazuh Agent
+   C:\Program Files (x86)\ossec-agent\win32ui.exe
    ```
 2. Terdapat **2 kolom** yang perlu diisi:
    - **Wazuh Manager address**: `localhost` (atau hostname server)
@@ -78,9 +78,9 @@ https://localhost:443 → Agents → Status: Active (green)
 
 ## Wazuh Agent UI
 
-Buka dari Start Menu:
+Lokasi:
 ```
-Start → Wazuh → Wazuh Agent
+C:\Program Files (x86)\ossec-agent\win32ui.exe
 ```
 
 **Fitur UI:**
