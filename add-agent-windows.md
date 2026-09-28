@@ -97,6 +97,8 @@ Status   Name               DisplayName
 Running  WazuhSvc           Wazuh Agent
 ```
 
+> **CATATAN:** `WazuhSvc` adalah nama service-nya. Gunakan nama ini untuk perintah di bawah.
+
 ### Kapan Start, Stop, Restart?
 
 | Kondisi | Aksi | Alasan |
@@ -110,19 +112,19 @@ Running  WazuhSvc           Wazuh Agent
 ### Start Service
 
 ```powershell
-Start-Service -Name "Wazuh"
+Start-Service -Name "WazuhSvc"
 ```
 
 ### Stop Service
 
 ```powershell
-Stop-Service -Name "Wazuh"
+Stop-Service -Name "WazuhSvc"
 ```
 
 ### Restart Service
 
 ```powershell
-Restart-Service -Name "Wazuh"
+Restart-Service -Name "WazuhSvc"
 ```
 
 ---
@@ -170,13 +172,13 @@ C:\Program Files (x86)\ossec-agent\win32ui.exe
 Get-Service *wazuh*
 
 # Start service
-Start-Service -Name "Wazuh"
+Start-Service -Name "WazuhSvc"
 
 # Stop service
-Stop-Service -Name "Wazuh"
+Stop-Service -Name "WazuhSvc"
 
 # Restart service
-Restart-Service -Name "Wazuh"
+Restart-Service -Name "WazuhSvc"
 
 # Lihat log
 type "C:\Program Files (x86)\ossec-agent\ossec.log"
@@ -193,7 +195,7 @@ Wazuh Agent auto-start sudah enabled secara default saat install.
 
 Cek:
 ```powershell
-Get-Service -Name "Wazuh" | Select-Object Name, Status, StartType
+Get-Service -Name "WazuhSvc" | Select-Object Name, Status, StartType
 ```
 
 ---
