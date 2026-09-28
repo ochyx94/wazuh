@@ -84,34 +84,18 @@ File akan langsung ter-download.
 
 ## Langkah 5: Kelola Service
 
-### Cek Nama Service
-
-Sebelum mengelola service, cek nama service yang benar:
+### Cek Nama dan Status Service (PowerShell)
 
 ```powershell
-sc query
+Get-Service *wazuh*
 ```
 
-Cari service dengan nama **Wazuh**.
-
-Contoh output:
+Output:
 ```
-SERVICE_NAME: WazuhSvc
-DISPLAY_NAME: Wazuh Agent
+Status   Name               DisplayName
+------   ----               -----------
+Running  WazuhSvc           Wazuh Agent
 ```
-
-> **CATATAN:** Nama service mungkin berbeda. Pastikan cek dulu sebelum menjalankan perintah di bawah.
-
-### Cek Status Service
-
-```powershell
-sc query WazuhSvc
-```
-
-Output menunjukkan STATUS service:
-- `STOPPED` = service tidak jalan
-- `RUNNING` = service jalan
-- `PAUSED` = service pause
 
 ### Kapan Start, Stop, Restart?
 
@@ -120,25 +104,25 @@ Output menunjukkan STATUS service:
 | Agent tidak konek ke manager | **Restart** | Reset koneksi |
 | Setelah edit konfigurasi | **Restart** | Apply konfigurasi baru |
 | Agent macet/bermasalah | **Stop** lalu **Start** | Fresh start |
-| mau hentikan monitoring | **Stop** | Stop monitoring |
+| Mau hentikan monitoring | **Stop** | Stop monitoring |
 | Mau mulai monitoring | **Start** | Mulai monitoring |
 
 ### Start Service
 
 ```powershell
-net start WazuhSvc
+Start-Service -Name "Wazuh"
 ```
 
 ### Stop Service
 
 ```powershell
-net stop WazuhSvc
+Stop-Service -Name "Wazuh"
 ```
 
 ### Restart Service
 
 ```powershell
-net stop WazuhSvc && net start WazuhSvc
+Restart-Service -Name "Wazuh"
 ```
 
 ---
@@ -182,20 +166,17 @@ C:\Program Files (x86)\ossec-agent\win32ui.exe
 ## Command Penting
 
 ```powershell
-# Cek nama service
-sc query
-
-# Cek status service
-sc query WazuhSvc
+# Cek nama dan status service
+Get-Service *wazuh*
 
 # Start service
-net start WazuhSvc
+Start-Service -Name "Wazuh"
 
 # Stop service
-net stop WazuhSvc
+Stop-Service -Name "Wazuh"
 
 # Restart service
-net stop WazuhSvc && net start WazuhSvc
+Restart-Service -Name "Wazuh"
 
 # Lihat log
 type "C:\Program Files (x86)\ossec-agent\ossec.log"
@@ -212,12 +193,7 @@ Wazuh Agent auto-start sudah enabled secara default saat install.
 
 Cek:
 ```powershell
-sc qc WazuhSvc
-```
-
-Jika `AUTO_START` bukan `AUTO`, ubah:
-```powershell
-sc config WazuhSvc start= auto
+Get-Service -Name "Wazuh" | Select-Object Name, Status, StartType
 ```
 
 ---
