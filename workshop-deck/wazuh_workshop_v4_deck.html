@@ -135,7 +135,7 @@
   <div class="vgrid">
     <div class="vcard"><span class="icon">💪</span><b>Satpam</b><div class="sub">berjaga di pintu<br>(monitoring akses)</div></div>
     <div class="vcard"><span class="icon">📹</span><b>CCTV</b><div class="sub">rekam semua aktivitas<br>(log &amp; alert)</div></div>
-    <div class="vcard"><span class="icon">🌲</span><b>Ranger</b><div class="sub">patroli cari tanda bahaya<br>(threat hunting)</div></div>
+    <div class="vcard"><span class="icon">🚔</span><b>Polisi Patroli</b><div class="sub">keliling cari tanda bahaya<br>(mencari peredaran ilegal)</div></div>
   </div>
 </section>
 
@@ -167,7 +167,7 @@
   <h2>👤 Siapa Saja di SOC? (Level Analyst)</h2>
   <div class="vgrid">
     <div class="vcard"><span class="icon">👀</span><b>L1 SOC Analyst</b><div class="sub">Monitoring &amp; Triage</div>• pantau alert<br>• analisis log<br>• buat tiket insiden<br>• deteksi kerentanan</div>
-    <div class="vcard"><span class="icon">🕵️</span><b>L2 SOC Analyst</b><div class="sub">Investigator</div>• investigasi mendalam<br>• containment<br>• + Threat Intelligence<br>&nbsp;</div>
+    <div class="vcard"><span class="icon">🕵️</span><b>L2 SOC Analyst</b><div class="sub">Investigator</div>• investigasi mendalam<br>• containment <span class="dim">(isolasi komputer yg terkena)</span><br>• Threat Intelligence <span class="dim">(info tren serangan terbaru)</span><br>&nbsp;</div>
   </div>
   <p class="small dim">Dua level inilah jenjang SOC Analyst resmi di Indonesia — skema sertifikasi BSSN (SKKNI).</p>
 </section>
@@ -461,9 +461,9 @@
   <table class="qa-table">
     <tr><td><span class="mono">id</span></td><td>nomor unik rule (custom: 100000–120000)</td></tr>
     <tr><td><span class="mono">level</span></td><td>tingkat severity 0–15</td></tr>
-    <tr><td><span class="mono">decoded_as</span></td><td>match jika decoder tertentu cocok</td></tr>
+    <tr><td><span class="mono">decoded_as</span></td><td>match jika decoder tertentu cocok <span class="dim">(mis. "log ini dari sshd")</span></td></tr>
     <tr><td><span class="mono">field</span></td><td>match nilai field hasil decoder</td></tr>
-    <tr><td><span class="mono">if_sid</span></td><td>match jika rule induk juga match</td></tr>
+    <tr><td><span class="mono">if_sid</span></td><td>match jika rule induk juga match <span class="dim">(rule "anak" dari rule lain)</span></td></tr>
     <tr><td><span class="mono">frequency + timeframe</span></td><td>deteksi kejadian BERULANG 🔁</td></tr>
   </table>
 </section>
@@ -547,7 +547,7 @@
   <h2>🦠 Perilaku Attacker yang Tertangkap FIM</h2>
   <ul class="tight">
     <li><b>Malware</b> menulis file ke system directory</li>
-    <li><b>Persistence</b>: ubah Run keys / buat scheduled task</li>
+    <li><b>Persistence</b> <span class="dim">(cara attacker "nempel" agar aktif setelah restart)</span>: ubah Run keys / buat scheduled task</li>
     <li><b>Config change</b>: ubah <span class="mono">/etc/passwd</span>, registry Windows</li>
   </ul>
   <p class="small dim">Attacker hampir selalu meninggalkan jejak file — FIM menangkapnya.</p>
@@ -777,7 +777,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 <!-- Slide 57 -->
 <section>
   <h2>🛠️ Persiapan: Aktifkan PowerShell Logging</h2>
-  <p class="small">Sekali saja sebelum praktikum — agar setiap command tercatat di Event Viewer (Event 4104).</p>
+  <p class="small">Sekali saja sebelum praktikum — agar setiap command PowerShell tercatat di Event Viewer. <span class="dim">("Script Block Logging" = fitur bawaan Windows yang merekam perintah PowerShell)</span> <b>(Event 4104)</b>.</p>
   <table class="qa-table small" style="text-align:left">
     <tr><td>1️⃣ Buka Group Policy Editor</td><td>Tekan <code>Win + R</code> → ketik <code>gpedit.msc</code> → Enter</td></tr>
     <tr><td>2️⃣ Navigasi ke menu</td><td>Computer Configuration → Administrative Templates → Windows Components → <b>Windows PowerShell</b></td></tr>
