@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Workshop Wazuh — Security Monitoring (v4.2 · 68 slide)</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/black.min.css">
+<link rel="stylesheet" href="/assets/reveal.min.css">
+<link rel="stylesheet" href="/assets/reveal-black.min.css">
 <style>
   :root {
     --wazuh-blue: #0d6efd;
@@ -924,9 +924,55 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+<script src="/assets/reveal.min.js"></script>
 <script>
   Reveal.initialize({ hash: true, slideNumber: 'c/t', transition: 'slide', width: 1280, height: 720, margin: 0.06 });
+</script>
+<script>
+// [FIX] Re-inject custom CSS (workaround: reveal.js head processing merusak style tag)
+(function(){
+  function addCSS(){
+    if (document.getElementById('vfix')) return;
+    const st = document.createElement('style');
+    st.id = 'vfix';
+    st.textContent = `
+  .flow { font-size: 0.85em; line-height: 1.9; }
+  .flow .arrow { color: var(--wazuh-blue, #0d6efd); font-weight: bold; }
+  pre.code { background: #161b22; color: #e6edf3; border: 1px solid #30363d; border-radius: 10px; padding: 0.5em 0.8em; font-size: 0.58em; box-shadow: none; text-align: left; width: 100%; }
+  pre.code code { font-family: monospace; }
+  table.qa-table { font-size: 0.82em; border-collapse: collapse; width: 100%; }
+  table.qa-table td { padding: 0.28em 0.7em; border-bottom: 1px solid #30363d; }
+  ul.tight li { margin-bottom: 0.35em; }
+  .vflow { display: flex !important; align-items: center; justify-content: center; gap: 0.4em; margin: 0.7em 0; flex-wrap: wrap; }
+  .vbox { background: #161b22; border: 2px solid #0d6efd; border-radius: 10px; padding: 0.45em 0.8em; text-align: center; font-size: 0.62em; }
+  .vbox .icon { font-size: 1.6em; display: block; margin-bottom: 0.15em; }
+  .vbox .lbl { font-weight: bold; color: #e6edf3; }
+  .vbox .sub { font-size: 0.85em; color: #8b949e; }
+  .varrow { color: #0d6efd; font-size: 1.2em; font-weight: bold; }
+  .vgrid { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6em; margin: 0.6em 0; }
+  .vcard { background: #161b22; border: 1px solid #30363d; border-left: 4px solid #0d6efd; border-radius: 8px; padding: 0.5em 0.7em; font-size: 0.6em; text-align: left; }
+  .vcard .icon { font-size: 1.7em; display: block; margin-bottom: 0.2em; }
+  .vcard b { color: #e6edf3; }
+  .vcard .sub { color: #8b949e; }
+  .vwarn { border-left-color: #d29922; }
+  .vok { border-left-color: #3fb950; }
+  .vbad { border-left-color: #f85149; }
+  :root { --wazuh-blue: #0d6efd; --ok: #2ea043; --warn: #d29922; --bad: #f85149; }
+  .badge { display: inline-block; padding: 0.08em 0.6em; border-radius: 999px; font-size: 0.7em; border: 1px solid currentColor; }
+  .recap { border: 2px solid #0d6efd; border-radius: 14px; padding: 0.6em 1em; background: rgba(13,110,253,0.08); }
+  .etika { border: 2px solid #f85149; border-radius: 14px; padding: 0.8em 1.2em; background: rgba(248,81,73,0.08); font-size: 0.95em; }
+  .stat-grid { display: flex; gap: 1em; margin: 0.4em 0; }
+  .stat-box { flex: 1; text-align: center; border: 1px solid #30363d; border-radius: 12px; padding: 0.6em 0.3em; background: #0d1117; }
+  .stat-box .num { font-size: 1.6em; font-weight: bold; color: #0d6efd; }
+  .stat-box .lbl { font-size: 0.55em; color: #9aa4b2; }
+`;
+    document.head.appendChild(st);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addCSS);
+  else addCSS();
+  // double-setelah reveal init
+  window.addEventListener('load', addCSS);
+})();
 </script>
 </body>
 </html>
