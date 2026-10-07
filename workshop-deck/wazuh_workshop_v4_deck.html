@@ -37,6 +37,24 @@
   }
   pre.code code { font-family: monospace; }
   table.qa-table { font-size: 0.82em; border-collapse: collapse; width: 100%; }
+  /* [v4.1] Visual components */
+  .vflow { display: flex; align-items: center; justify-content: center; gap: 0.4em; margin: 0.7em 0; flex-wrap: wrap; }
+  .vbox { background: #161b22; border: 2px solid var(--wazuh-blue); border-radius: 10px;
+          padding: 0.45em 0.8em; text-align: center; font-size: 0.62em; }
+  .vbox .icon { font-size: 1.6em; display: block; margin-bottom: 0.15em; }
+  .vbox .lbl { font-weight: bold; color: #e6edf3; }
+  .vbox .sub { font-size: 0.85em; color: #8b949e; }
+  .varrow { color: var(--wazuh-blue); font-size: 1.2em; font-weight: bold; }
+  .vgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6em; margin: 0.6em 0; }
+  .vcard { background: #161b22; border: 1px solid #30363d; border-left: 4px solid var(--wazuh-blue);
+           border-radius: 8px; padding: 0.5em 0.7em; font-size: 0.6em; }
+  .vcard .icon { font-size: 1.7em; display: block; margin-bottom: 0.2em; }
+  .vcard b { color: #e6edf3; }
+  .vcard .sub { color: #8b949e; }
+  .vwarn { border-left-color: #d29922; }
+  .vok { border-left-color: #3fb950; }
+  .vbad { border-left-color: #f85149; }
+  table.qa-table td { padding: 0.28em 0.7em; border-bottom: 1px solid #30363d; }
   table.qa-table td { padding: 0.28em 0.7em; border-bottom: 1px solid #30363d; }
   .badge { display: inline-block; padding: 0.08em 0.6em; border-radius: 999px; font-size: 0.7em; border: 1px solid currentColor; }
   .recap {
@@ -113,16 +131,12 @@
 <!-- Slide 4 -->
 <section>
   <h2>🏢 Apa itu SOC?</h2>
-  <p><b>S</b>ecurity <b>O</b>perations <b>C</b>enter</p>
-  <ul class="tight">
-    <li>Tim yang <b>jaga keamanan sistem 24/7</b></li>
-  </ul>
-  <p class="blue">Analogi: <b>satpam + CCTV + ranger hutan</b> 🌲</p>
-  <ul class="tight small">
-    <li><b>Satpam</b> → berjaga di pintu (monitoring akses)</li>
-    <li><b>CCTV</b> → merekam semua aktivitas (log &amp; alert)</li>
-    <li><b>Ranger</b> → berpatroli mencari tanda bahaya (threat hunting)</li>
-  </ul>
+  <p><b>S</b>ecurity <b>O</b>perations <b>C</b>enter — tim yang jaga keamanan sistem 24/7</p>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">💪</span><b>Satpam</b><div class="sub">berjaga di pintu<br>(monitoring akses)</div></div>
+    <div class="vcard"><span class="icon">📹</span><b>CCTV</b><div class="sub">rekam semua aktivitas<br>(log &amp; alert)</div></div>
+    <div class="vcard"><span class="icon">🌲</span><b>Ranger</b><div class="sub">patroli cari tanda bahaya<br>(threat hunting)</div></div>
+  </div>
 </section>
 
 <!-- Slide 5 -->
@@ -151,28 +165,26 @@
 <!-- Slide 7 -->
 <section>
   <h2>👤 Siapa Saja di SOC? (Level Analyst)</h2>
-  <table class="qa-table">
-    <tr><td><b>L1 SOC Analyst</b></td><td><b>Monitoring &amp; Triage</b>: pantau alert, analisis log,
-        buat tiket insiden, deteksi kerentanan</td></tr>
-    <tr><td><b>L2 SOC Analyst</b></td><td><b>Investigator</b>: investigasi mendalam, containment,
-        + <b>Threat Intelligence</b> pada perimeter keamanan</td></tr>
-  </table>
-  <p class="blue">Dua level inilah jenjang SOC Analyst resmi di Indonesia —
-  skema sertifikasi BSSN (SKKNI).</p>
-  <p class="small dim">Hari ini kita bermain peran sebagai <b>L1</b> 😉</p>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">👀</span><b>L1 SOC Analyst</b><div class="sub">Monitoring &amp; Triage</div>• pantau alert<br>• analisis log<br>• buat tiket insiden<br>• deteksi kerentanan</div>
+    <div class="vcard"><span class="icon">🕵️</span><b>L2 SOC Analyst</b><div class="sub">Investigator</div>• investigasi mendalam<br>• containment<br>• + Threat Intelligence<br>&nbsp;</div>
+  </div>
+  <p class="small dim">Dua level inilah jenjang SOC Analyst resmi di Indonesia — skema sertifikasi BSSN (SKKNI).</p>
 </section>
 
 <!-- Slide 8 -->
 <section>
   <h2>🪜 Alur Kerja L1 → L2</h2>
-  <p class="flow small">
-    <b>L1</b>: pantau alert <span class="arrow">→</span> triage
-    <span class="arrow">→</span> perlu investigasi? <span class="arrow">→</span> eskalasi tiket ke
-    <b>L2</b>: investigasi mendalam, containment, threat intel
-  </p>
-  <p class="small">Triage harian L1: baca deskripsi &amp; level → identifikasi (siapa/apa/dari mana)
-  → bandingkan aktivitas normal → putuskan: <b class="ok">aman (tutup)</b> / <b class="warn">pantau</b> / <b class="bad">eskalasi ke L2</b></p>
-  <p class="small dim">Di organisasi kecil, satu orang bisa menjalankan keduanya sekaligus.</p>
+  <div class="vflow">
+    <div class="vbox"><span class="icon">👀</span><span class="lbl">L1: Pantau</span><div class="sub">monitoring alert</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🧹</span><span class="lbl">Triage</span><div class="sub">baca &amp; identifikasi</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">⚖️</span><span class="lbl">Putuskan</span><div class="sub">aman / pantau / eskalasi</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox vwarn"><span class="icon">🕵️</span><span class="lbl">L2: Investigasi</span><div class="sub">mendalam + containment</div></div>
+  </div>
+  <p class="small dim">Di organisasi kecil, satu orang bisa menjalankan keduanya.</p>
 </section>
 
 <!-- Slide 9 -->
@@ -192,35 +204,35 @@
 <section>
   <h2>📊 Apa itu SIEM?</h2>
   <p><b>S</b>ecurity <b>I</b>nformation and <b>E</b>vent <b>M</b>anagement</p>
-  <ul class="tight">
-    <li>Sistem untuk <b>mengumpulkan</b> log dari semua sumber</li>
-    <li><b>Mengolah</b> menjadi informasi keamanan</li>
-    <li><b>Membunyikan alarm</b> saat ada yang mencurigakan</li>
-  </ul>
-  <p class="blue">Satu tempat untuk melihat SELURUH keadaan keamanan.</p>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">📥</span><b>Kumpulkan</b><div class="sub">log dari semua sumber</div></div>
+    <div class="vcard"><span class="icon">⚙️</span><b>Olah</b><div class="sub">jadi informasi keamanan</div></div>
+    <div class="vcard vbad"><span class="icon">🚨</span><b>Alarm</b><div class="sub">saat ada yang curiga</div></div>
+  </div>
+  <p class="small dim">Satu tempat untuk melihat SELURUH keadaan keamanan.</p>
 </section>
 
 <!-- Slide 11 -->
 <section>
   <h2>😩 Masalah Tanpa SIEM</h2>
-  <ul class="tight">
-    <li>50 server = 50 tempat cek log berbeda 😱</li>
-    <li>Format log beda-beda, tidak bisa dibandingkan</li>
-    <li>Serangan menyebar malam hari — siapkan begadang?</li>
-    <li>Bukti insiden tercecer / tertimpa rotasi log</li>
-  </ul>
-  <p class="bad"><b>Hasilnya: kejadian penting terlewat, respon lambat.</b></p>
+  <div class="vgrid">
+    <div class="vcard vbad"><span class="icon">🔢</span><b>50 Server</b><div class="sub">50 tempat cek log berbeda</div></div>
+    <div class="vcard vbad"><span class="icon">🎭</span><b>Format Beda-beda</b><div class="sub">tidak bisa dibandingkan</div></div>
+    <div class="vcard vbad"><span class="icon">🌙</span><b>Serangan Malam</b><div class="sub">siapkan begadang?</div></div>
+    <div class="vcard vbad"><span class="icon">🧩</span><b>Bukti Tersebar</b><div class="sub">tercecer / tertimpa rotasi</div></div>
+  </div>
+  <p class="small dim">Hasilnya: kejadian penting terlewat, respon lambat.</p>
 </section>
 
 <!-- Slide 12 -->
 <section>
   <h2>✅ Manfaat SIEM</h2>
-  <ul class="tight">
-    <li><b>Centralized</b> — semua log di satu tempat</li>
-    <li><b>Search</b> — cari kejadian dalam hitungan detik</li>
-    <li><b>Alerting</b> — alarm otomatis saat pola berbahaya</li>
-    <li><b>Correlation</b> — hubungkan kejadian dari banyak sumber</li>
-  </ul>
+  <div class="vgrid">
+    <div class="vcard vok"><span class="icon">🏛️</span><b>Centralized</b><div class="sub">semua log satu tempat</div></div>
+    <div class="vcard vok"><span class="icon">⚡</span><b>Search</b><div class="sub">cari dalam hitungan detik</div></div>
+    <div class="vcard vok"><span class="icon">🚨</span><b>Alerting</b><div class="sub">alarm otomatis</div></div>
+    <div class="vcard vok"><span class="icon">🔗</span><b>Correlation</b><div class="sub">hubungkan banyak sumber</div></div>
+  </div>
 </section>
 
 <!-- Slide 13 -->
@@ -238,61 +250,63 @@
 <!-- Slide 14 -->
 <section>
   <h2>🧩 Komponen SIEM (Pipeline)</h2>
-  <p class="flow">
-    <b>Data Collection</b> <span class="arrow">→</span>
-    <b>Parsing/Normalization</b> <span class="arrow">→</span>
-    <b>Storage</b> <span class="arrow">→</span>
-    <b>Analysis</b> <span class="arrow">→</span>
-    <b>Alerting</b>
-  </p>
-  <p class="small dim">Ingat pipeline ini — Wazuh punya padanannya untuk setiap tahap.</p>
+  <div class="vflow">
+    <div class="vbox"><span class="icon">📥</span><span class="lbl">Data Collection</span><div class="sub">kumpulkan log</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🔍</span><span class="lbl">Parsing</span><div class="sub">normalisasi</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">💾</span><span class="lbl">Storage</span><div class="sub">indexing</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🧠</span><span class="lbl">Analysis</span><div class="sub">rules &amp; deteksi</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🚨</span><span class="lbl">Alerting</span><div class="sub">notifikasi</div></div>
+  </div>
+  <p class="small dim">Ingat pipeline ini — Wazuh punya padanannya untuk setiap tahap (slide berikutnya).</p>
 </section>
 
 <!-- Slide 15 -->
 <section>
   <h2>🦾 Mengapa Wazuh?</h2>
-  <ul class="tight">
-    <li><b>Free &amp; open source</b> — tanpa lisensi</li>
-    <li><b>Cross-platform</b> — Windows, Linux, macOS, Docker, Cloud</li>
-    <li><b>Cocok untuk belajar</b> — install ringan, ada semua fitur SIEM</li>
-    <li><b>Komunitas besar</b> + dokumentasi lengkap</li>
-  </ul>
-  <p class="small dim">Versi lab kita: <span class="mono">4.14.7</span></p>
+  <div class="vgrid">
+    <div class="vcard vok"><span class="icon">🆓</span><b>Free &amp; Open Source</b><div class="sub">tanpa lisensi</div></div>
+    <div class="vcard"><span class="icon">💻</span><b>Cross-platform</b><div class="sub">Windows, Linux, macOS, Docker, Cloud</div></div>
+    <div class="vcard"><span class="icon">🎓</span><b>Cocok Belajar</b><div class="sub">install ringan, fitur lengkap</div></div>
+    <div class="vcard"><span class="icon">👥</span><b>Komunitas Besar</b><div class="sub">dokumentasi lengkap</div></div>
+  </div>
+  <p class="small dim">Versi lab kita: 4.14.7</p>
 </section>
 
 <!-- Slide 16 -->
 <section>
   <h2>🧱 Komponen Wazuh (1): Agent &amp; Manager</h2>
-  <ul class="tight">
-    <li>📡 <b>Agent</b> — terinstall di device (Windows/Linux),<br>
-        mengumpulkan log &amp; mengirim ke manager</li>
-    <li>🏢 <b>Manager</b> — otaknya: menerima log, menjalankan decoder &amp; rules,<br>
-        memutuskan mana yang jadi alert</li>
-  </ul>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">📡</span><b>Agent</b><div class="sub">terinstall di device<br>(Windows / Linux)</div>• kumpulkan log<br>• kirim ke manager</div>
+    <div class="vcard vok"><span class="icon">🏢</span><b>Manager</b><div class="sub">otaknya sistem</div>• terima log<br>• jalankan decoder &amp; rules<br>• putuskan mana yang jadi alert</div>
+  </div>
 </section>
 
 <!-- Slide 17 -->
 <section>
   <h2>🧱 Komponen Wazuh (2): Indexer &amp; Dashboard</h2>
-  <ul class="tight">
-    <li>🗄️ <b>Indexer</b> — database penyimpanan logs &amp; alerts (search engine)</li>
-    <li>🖥️ <b>Dashboard</b> — antarmuka web: lihat, cari, visualisasikan alert</li>
-  </ul>
-  <p class="small dim">Di lab: dashboard di <span class="mono">https://localhost:443</span></p>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">🗄️</span><b>Indexer</b><div class="sub">database + search engine</div>• simpan logs &amp; alerts<br>• indexing untuk pencarian cepat</div>
+    <div class="vcard"><span class="icon">🖥️</span><b>Dashboard</b><div class="sub">antarmuka web</div>• lihat &amp; cari alert<br>• visualisasi data<br>• di lab: localhost:443</div>
+  </div>
 </section>
 
 <!-- Slide 18 -->
 <section>
   <h2>🔄 Diagram Alur Wazuh</h2>
-  <p class="flow" style="font-size:1em">
-    📡 <b>Agent</b><br>
-    <span class="arrow">↓</span> kirim log<br>
-    🏢 <b>Manager</b> (decoder → rules → alert)<br>
-    <span class="arrow">↓</span> simpan alert<br>
-    🗄️ <b>Indexer</b><br>
-    <span class="arrow">↓</span> tampilkan<br>
-    🖥️ <b>Dashboard</b> <span class="arrow">→</span> 👀 Analyst
-  </p>
+  <div class="vflow">
+    <div class="vbox"><span class="icon">📡</span><span class="lbl">Agent</span><div class="sub">kirim log</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox vok"><span class="icon">🏢</span><span class="lbl">Manager</span><div class="sub">decoder → rules → alert</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🗄️</span><span class="lbl">Indexer</span><div class="sub">simpan alert</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🖥️</span><span class="lbl">Dashboard</span><div class="sub">👀 Analyst</div></div>
+  </div>
+  <p class="small dim">Pipeline SIEM slide 14 = kenyataan di Wazuh.</p>
 </section>
 
 <!-- Slide 19 -->
@@ -332,21 +346,10 @@
 <!-- Slide 22 -->
 <section>
   <h2>📂 Sumber Log yang Dikumpulkan</h2>
-  <div class="two-col small">
-    <div>
-      <p><b>Windows</b></p>
-      <ul class="tight">
-        <li>Event Viewer: Security, System, Application</li>
-        <li>Logon, privilege use, process creation</li>
-      </ul>
-    </div>
-    <div>
-      <p><b>Linux</b></p>
-      <ul class="tight">
-        <li><span class="mono">/var/log/*</span> — auth, syslog, dll</li>
-        <li>Custom logs (file-based)</li>
-      </ul>
-    </div>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">🪟</span><b>Windows Event Viewer</b><div class="sub">Security, System, Application</div>logon, privilege use, process creation</div>
+    <div class="vcard"><span class="icon">🐧</span><b>Linux /var/log/*</b><div class="sub">auth, syslog, dll</div>SSH, sudo, cron, kernel</div>
+    <div class="vcard"><span class="icon">📂</span><b>Custom Logs</b><div class="sub">file-based</div>aplikasi internal, database, dll</div>
   </div>
 </section>
 
@@ -376,28 +379,23 @@
 <!-- Slide 25 -->
 <section>
   <h2>📖 Fitur 2: Log Processing — Decoder</h2>
-  <p class="blue"><b>Decoder = penerjemah</b></p>
-  <ul class="tight">
-    <li>Menerjemahkan log mentah → format terstruktur</li>
-    <li>Mengapa perlu? Format log tiap aplikasi beda-beda</li>
-    <li>Tanpa decoder: log hanya tumpukan teks</li>
-  </ul>
-  <p class="small dim">Analogi: penerjemah yang mengubah kalimat acak → data rapi.</p>
+  <div class="vflow">
+    <div class="vbox"><span class="icon">📄</span><span class="lbl">Log Mentah</span><div class="sub">teks acak</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox vok"><span class="icon">📖</span><span class="lbl">Decoder</span><div class="sub">penerjemah</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🗃️</span><span class="lbl">Data Rapi</span><div class="sub">terstruktur</div></div>
+  </div>
+  <p class="small dim">Format log tiap aplikasi beda-beda — tanpa decoder, log hanya tumpukan teks.</p>
 </section>
 
 <!-- Slide 26 -->
 <section>
   <h2>⚙️ Cara Kerja Decoder (2 Fase)</h2>
-  <p><b>Phase 1 — Pre-decoding</b></p>
-  <ul class="tight small">
-    <li>Ambil: timestamp, hostname, program_name</li>
-    <li>Pisahkan header dari isi log</li>
-  </ul>
-  <p><b>Phase 2 — Decoding</b></p>
-  <ul class="tight small">
-    <li>Cocokkan dengan decoder yang dikenal</li>
-    <li>Ekstrak field: <span class="mono">user</span>, <span class="mono">srcip</span>, <span class="mono">action</span>, …</li>
-  </ul>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">1️⃣</span><b>Pre-decoding</b><div class="sub">pisahkan header</div>• timestamp<br>• hostname<br>• program_name</div>
+    <div class="vcard vok"><span class="icon">2️⃣</span><b>Decoding</b><div class="sub">cocokkan &amp; ekstrak</div>• match dgn decoder dikenal<br>• ekstrak field:<br>&nbsp;&nbsp;user, srcip, action, …</div>
+  </div>
 </section>
 
 <!-- Slide 27 -->
@@ -447,13 +445,14 @@
 <!-- Slide 30 -->
 <section>
   <h2>⚖️ Apa itu Rules?</h2>
-  <p class="blue"><b>Rule = petugas penentu</b> (aman / curiga / berbahaya)</p>
-  <ul class="tight">
-    <li>Aturan deteksi dalam format XML</li>
-    <li>Logika: <b>IF-THIS-THEN-ALERT</b></li>
-    <li>Menggunakan field hasil decoder, bukan teks mentah</li>
-  </ul>
-  <p class="small dim">Decoder membaca, rule memutuskan.</p>
+  <div class="vflow">
+    <div class="vbox"><span class="icon">🗃️</span><span class="lbl">Field hasil decoder</span></div>
+    <span class="varrow">→</span>
+    <div class="vbox vok"><span class="icon">⚖️</span><span class="lbl">RULE</span><div class="sub">IF-THIS-THEN-ALERT</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox vbad"><span class="icon">🚨</span><span class="lbl">Alert</span></div>
+  </div>
+  <p class="small dim">Decoder <b>membaca</b>, rule <b>memutuskan</b>. Format XML, pakai field — bukan teks mentah.</p>
 </section>
 
 <!-- Slide 31 -->
@@ -533,11 +532,14 @@
 <!-- Slide 37 -->
 <section>
   <h2>📁 Fitur 3: File Integrity Monitoring (FIM)</h2>
-  <p class="blue"><b>FIM = penjaga lemari arsip</b> 🗄️</p>
-  <ul class="tight">
-    <li>Memantau perubahan file: <b>created, modified, deleted, renamed</b></li>
-    <li>Real-time alert saat file penting berubah</li>
-  </ul>
+  <div class="vflow">
+    <div class="vbox"><span class="icon">🗄️</span><span class="lbl">File Penting</span><div class="sub">arsip sistem</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox vwarn"><span class="icon">🦠</span><span class="lbl">Attacker</span><div class="sub">created / modified / deleted / renamed</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox vbad"><span class="icon">🚨</span><span class="lbl">Real-time Alert</span></div>
+  </div>
+  <p class="small dim">FIM = penjaga lemari arsip 🗄️ — real-time alert saat file penting berubah.</p>
 </section>
 
 <!-- Slide 38 -->
@@ -884,36 +886,24 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 <!-- Slide 66 -->
 <section>
   <h2>🚨 Handling Alert: JANGAN PANIK — 7 Langkah</h2>
-  <ol class="tight small">
-    <li>Baca description alert</li>
-    <li>Cek severity level</li>
-    <li>Identifikasi: user, source IP, host, waktu</li>
-    <li>Cek apakah event berulang</li>
-    <li>Bandingkan dengan aktivitas normal</li>
-    <li>Putuskan: false positive atau insiden nyata?</li>
-    <li>Ambil tindakan sesuai risiko</li>
-  </ol>
+  <div class="vgrid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+    <div class="vcard"><span class="icon">1️⃣</span><b>Baca</b><div class="sub">description alert</div></div>
+    <div class="vcard"><span class="icon">2️⃣</span><b>Cek Level</b><div class="sub">severity</div></div>
+    <div class="vcard"><span class="icon">3️⃣</span><b>Identifikasi</b><div class="sub">user, IP, host, waktu</div></div>
+    <div class="vcard"><span class="icon">4️⃣</span><b>Perulangan?</b><div class="sub">cek event berulang</div></div>
+    <div class="vcard"><span class="icon">5️⃣</span><b>Bandingkan</b><div class="sub">dgn aktivitas normal</div></div>
+    <div class="vcard vwarn"><span class="icon">6️⃣</span><b>Putuskan</b><div class="sub">FP atau insiden?</div></div>
+    <div class="vcard vbad"><span class="icon">7️⃣</span><b>Bertindak</b><div class="sub">sesuai risiko</div></div>
+  </div>
 </section>
 
 <!-- Slide 67 -->
 <section>
   <h2>🛡️ Mitigasi Brute Force</h2>
-  <div class="two-col small">
-    <div>
-      <p><b>Menangani alert dari praktikum</b></p>
-      <ul class="tight">
-        <li>Hitung percobaan per IP → blokir agresif (firewall/fail2ban)</li>
-        <li>Cek login BERHASIL? → insiden! reset password</li>
-      </ul>
-    </div>
-    <div>
-      <p><b>Mitigasi jangka panjang</b></p>
-      <ul class="tight">
-        <li>SSH key, matikan password auth</li>
-        <li>Fail2ban / rate limiting</li>
-        <li>MFA admin · disable root login</li>
-      </ul>
-    </div>
+  <div class="vgrid">
+    <div class="vcard vbad"><span class="icon">🚨</span><b>Menangani Alert</b><div class="sub">dari praktikum</div>• hitung percobaan per IP<br>• blokir agresif (firewall/fail2ban)</div>
+    <div class="vcard vwarn"><span class="icon">🔍</span><b>Cek Login Sukses</b><div class="sub">login BERHASIL = insiden!</div>• reset password<br>• investigasi mendalam</div>
+    <div class="vcard vok"><span class="icon">🛡️</span><b>Jangka Panjang</b><div class="sub">perkuat pertahanan</div>• SSH key, matikan password auth<br>• fail2ban / rate limiting<br>• MFA admin, disable root</div>
   </div>
   <p class="small dim">Banyak alert = pertahanan BEKERJA — tetap verifikasi tidak ada yang lolos.</p>
 </section>
