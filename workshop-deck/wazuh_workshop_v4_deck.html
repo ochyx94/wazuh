@@ -776,14 +776,32 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 
 <!-- Slide 57 -->
 <section>
-  <h2>🧪 Langkah Attack 1</h2>
-  <ol class="tight small">
-    <li>Buka PowerShell, jalankan: <span class="mono">ping google.com</span>, <span class="mono">whoami</span>, <span class="mono">dir</span></li>
-    <li>Buka Event Viewer → Applications and Services Logs → Windows PowerShell</li>
-    <li>Cari <b>Event 4104</b> — bandingkan dengan yang diketik</li>
-    <li>Buka Wazuh Dashboard → cari event dari agent Windows</li>
-  </ol>
-  <p class="small dim">Prasyarat: Script Block Logging aktif (slide persiapan).</p>
+  <h2>🛠️ Persiapan: Aktifkan PowerShell Logging</h2>
+  <p class="small">Sekali saja sebelum praktikum — agar setiap command tercatat di Event Viewer (Event 4104).</p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Buka Group Policy Editor</td><td>Tekan <code>Win + R</code> → ketik <code>gpedit.msc</code> → Enter</td></tr>
+    <tr><td>2️⃣ Navigasi ke menu</td><td>Computer Configuration → Administrative Templates → Windows Components → <b>Windows PowerShell</b></td></tr>
+    <tr><td>3️⃣ Aktifkan logging</td><td>Klik 2x <b>"Turn on PowerShell Script Block Logging"</b> → pilih <b>Enabled</b> → OK</td></tr>
+    <tr><td>4️⃣ Update policy</td><td><code>Win + R</code> → ketik <code>cmd</code> → Enter → ketik <code>gpupdate /force</code> → Enter</td></tr>
+    <tr><td>5️⃣ Selesai ✅</td><td>Lanjut ke Langkah Attack 1</td></tr>
+  </table>
+  <p class="small dim">📌 Komputer kantor/domain: minta bantuan IT admin jika gpedit tidak tersedia.</p>
+</section>
+
+<section>
+  <h2>🧪 Langkah Attack 1 — PowerShell</h2>
+  <p class="small"><b>Prasyarat (sekali saja, sebelum praktikum):</b> aktifkan PowerShell Logging — lihat slide persiapan.</p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Buka PowerShell</td><td>Start → ketik "powershell" → klik <b>Windows PowerShell</b></td></tr>
+    <tr><td>2️⃣ Jalankan 3 command</td><td>Ketik satu per satu, tekan Enter setelahnya:<br>
+      <code>ping google.com</code> <span class="dim">(cek koneksi ke internet)</span><br>
+      <code>whoami</code> <span class="dim">(tampilkan nama user kita)</span><br>
+      <code>dir</code> <span class="dim">(daftar file di folder sekarang)</span></td></tr>
+    <tr><td>3️⃣ Lihat jejaknya</td><td>Start → ketik "event viewer" → buka<br>
+      <b>Applications and Services Logs → Windows PowerShell → Operational</b></td></tr>
+    <tr><td>4️⃣ Cari Event ID 4104</td><td>Klik log terbaru (paling atas) — isinya = command yang tadi diketik</td></tr>
+    <tr><td>5️⃣ Cek di Wazuh</td><td>Dashboard → Discover → filter agent kamu → alert muncul!</td></tr>
+  </table>
 </section>
 
 <!-- Slide 58 -->
@@ -800,14 +818,16 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 
 <!-- Slide 59 -->
 <section>
-  <h2>🧪 Langkah Attack 2</h2>
-  <ol class="tight small">
-    <li>Buat file test di folder yang dimonitor:<br>
-    <span class="mono">echo test &gt; %TEMP%\lab-fim-test.txt</span></li>
-    <li>Buka Wazuh Dashboard → Security Events</li>
-    <li>Cari alert FIM → baca detail: <b>file path, timestamp, checksum</b></li>
-  </ol>
-  <p class="small dim">Malware membuat file → FIM menangkap → analyst tahu lebih cepat.</p>
+  <h2>🧪 Langkah Attack 2 — FIM</h2>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Buka Notepad</td><td>Start → ketik "notepad" → Enter</td></tr>
+    <tr><td>2️⃣ Tulis apa saja</td><td>Contoh: <code>ini file percobaan FIM</code></td></tr>
+    <tr><td>3️⃣ Simpan ke Desktop</td><td>File → Save As → pilih <b>Desktop</b> → nama: <code>lab-fim-test.txt</code> → Save</td></tr>
+    <tr><td>4️⃣ Ubah isinya</td><td>Tambah satu baris teks → Save lagi (Ctrl+S)</td></tr>
+    <tr><td>5️⃣ Hapus file</td><td>Klik kanan file di Desktop → Delete</td></tr>
+    <tr><td>6️⃣ Cek Wazuh</td><td>Dashboard → Discover → cari <code>rule.groups:syscheck</code></td></tr>
+  </table>
+  <p class="small dim">💡 3 aksi = 3 jenis alert: <b>file added</b> → <b>file modified</b> → <b>file deleted</b></p>
 </section>
 
 <!-- Slide 60 -->
