@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop Wazuh — Security Monitoring (v4.2 · 68 slide)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/black.min.css">
+<style>
+  :root {
+    --wazuh-blue: #0d6efd;
+    --ok: #2ea043;
+    --warn: #d29922;
+    --bad: #f85149;
+    --crit: #bc4c00;
+  }
+  .slides section { text-align: left; }
+  .slides h1, .slides h2, .slides h3 { text-transform: none; }
+  .title-slide { text-align: center !important; }
+  .small { font-size: 0.72em; }
+  .dim { color: #9aa4b2; }
+  .mono { font-family: monospace; background: #161b22; padding: 0.15em 0.5em; border-radius: 6px; }
+  .ok   { color: var(--ok); }
+  .warn { color: var(--warn); }
+  .bad  { color: var(--bad); }
+  .crit { color: var(--crit); }
+  .blue { color: var(--wazuh-blue); }
+  ul.tight li { margin-bottom: 0.35em; }
+  .two-col { display: flex; gap: 1.5em; }
+  .two-col > div { flex: 1; }
+  .flow { font-size: 0.85em; line-height: 1.9; }
+  .flow .arrow { color: var(--wazuh-blue); font-weight: bold; }
+  pre.code {
+    background: #161b22; color: #e6edf3; border: 1px solid #30363d;
+    border-radius: 10px; padding: 0.5em 0.8em; font-size: 0.58em;
+    box-shadow: none; text-align: left; width: 100%;
+  }
+  pre.code code { font-family: monospace; }
+  table.qa-table { font-size: 0.82em; border-collapse: collapse; width: 100%; }
+  table.qa-table td { padding: 0.28em 0.7em; border-bottom: 1px solid #30363d; }
+  .badge { display: inline-block; padding: 0.08em 0.6em; border-radius: 999px; font-size: 0.7em; border: 1px solid currentColor; }
+  .recap {
+    border: 2px solid var(--wazuh-blue); border-radius: 14px;
+    padding: 0.6em 1em; background: rgba(13,110,253,0.08);
+  }
+  .etika {
+    border: 2px solid var(--bad); border-radius: 14px;
+    padding: 0.8em 1.2em; background: rgba(248,81,73,0.08);
+    font-size: 0.95em;
+  }
+  .stat-grid { display: flex; gap: 1em; margin: 0.4em 0; }
+  .stat-box {
+    flex: 1; text-align: center; border: 1px solid #30363d;
+    border-radius: 12px; padding: 0.6em 0.3em; background: #0d1117;
+  }
+  .stat-box .num { font-size: 1.6em; font-weight: bold; color: var(--wazuh-blue); }
+  .stat-box .lbl { font-size: 0.55em; color: #9aa4b2; }
+</style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+<!-- ============ SESI I ============ -->
+<!-- Slide 1 -->
+<section class="title-slide">
+  <h1>🛡️ Security Monitoring</h1>
+  <h3>Exploring SIEM for Cybersecurity with Wazuh</h3>
+  <p class="dim">Workshop · 2 Sesi · ±3,5 jam (dengan istirahat)</p>
+  <p class="small dim">Sesi I: Konsep · Sesi II: Praktikum serangan + kasus nyata</p>
+</section>
+
+<!-- Slide 2 -->
+<section>
+  <h2>🗺️ Agenda Hari Ini</h2>
+  <div class="two-col">
+    <div>
+      <p class="blue"><b>SESI I (09.50–12.05)</b></p>
+      <ul class="tight small">
+        <li>Apa itu SOC?</li>
+        <li>Apa itu SIEM?</li>
+        <li>Wazuh sebagai SIEM</li>
+        <li>4 fitur utama Wazuh</li>
+        <li>Praktikum: install agent + dashboard</li>
+      </ul>
+    </div>
+    <div>
+      <p class="crit"><b>SESI II (13.01–14.11)</b></p>
+      <ul class="tight small">
+        <li>Etika &amp; persiapan lab</li>
+        <li>Attack 1: PowerShell visibility</li>
+        <li>Attack 2: File creation (FIM)</li>
+        <li>Attack 3: Brute Force SSH — <b>kasus nyata</b> ⭐</li>
+        <li>Log analysis + Q&amp;A</li>
+      </ul>
+    </div>
+  </div>
+  <p class="small dim">Bingung kapan saja? Langsung tanya — jangan tunggu akhir sesi.</p>
+</section>
+
+<!-- Slide 3 -->
+<section>
+  <h2>👋 Aturan Main</h2>
+  <ul class="tight">
+    <li>Tidak ada pertanyaan bodoh — <b>bertanya itu wajib</b></li>
+    <li>Praktikum dilakukan di lab masing-masing</li>
+    <li>Ikuti perintah pelatih step-by-step saat praktikum</li>
+    <li>Catat error yang muncul — itu materi belajar terbaik</li>
+  </ul>
+  <p class="small dim">Target: paham konsepnya, bukan hafal commandnya.</p>
+</section>
+
+<!-- Slide 4 -->
+<section>
+  <h2>🏢 Apa itu SOC?</h2>
+  <p><b>S</b>ecurity <b>O</b>perations <b>C</b>enter</p>
+  <ul class="tight">
+    <li>Tim yang <b>jaga keamanan sistem 24/7</b></li>
+  </ul>
+  <p class="blue">Analogi: <b>satpam + CCTV + ranger hutan</b> 🌲</p>
+  <ul class="tight small">
+    <li><b>Satpam</b> → berjaga di pintu (monitoring akses)</li>
+    <li><b>CCTV</b> → merekam semua aktivitas (log &amp; alert)</li>
+    <li><b>Ranger</b> → berpatroli mencari tanda bahaya (threat hunting)</li>
+  </ul>
+</section>
+
+<!-- Slide 5 -->
+<section>
+  <h2>🎯 Aktivitas SOC Team</h2>
+  <table class="qa-table">
+    <tr><td>👁️ <b>Monitoring</b></td><td>melihat log &amp; alert terus-menerus</td></tr>
+    <tr><td>🔍 <b>Investigation</b></td><td>selidiki alert: nyata atau palsu?</td></tr>
+    <tr><td>🚨 <b>Response</b></td><td>tindakan: blokir, isolate, perbaiki</td></tr>
+    <tr><td>📝 <b>Documentation</b></td><td>catat kronologi &amp; pelajaran</td></tr>
+  </table>
+  <p class="small dim">Siklus ini berputar setiap hari, 24/7.</p>
+</section>
+
+<!-- Slide 6 -->
+<section>
+  <h2>🔧 Tools yang Dipakai SOC</h2>
+  <ul class="tight">
+    <li><b class="blue">SIEM</b> — kumpul, olah, dan analisis log (fokus workshop ini)</li>
+    <li><b>SOAR</b> — otomasi respons (auto-block IP, dll)</li>
+    <li><b>Ticketing</b> — kelola insiden &amp; tugas</li>
+  </ul>
+  <p class="small dim">Hari ini kita dalami satu: <b>Wazuh sebagai SIEM</b>.</p>
+</section>
+
+<!-- Slide 7 -->
+<section>
+  <h2>👤 Siapa Saja di SOC? (Level Analyst)</h2>
+  <table class="qa-table">
+    <tr><td><b>L1 SOC Analyst</b></td><td><b>Monitoring &amp; Triage</b>: pantau alert, analisis log,
+        buat tiket insiden, deteksi kerentanan</td></tr>
+    <tr><td><b>L2 SOC Analyst</b></td><td><b>Investigator</b>: investigasi mendalam, containment,
+        + <b>Threat Intelligence</b> pada perimeter keamanan</td></tr>
+  </table>
+  <p class="blue">Dua level inilah jenjang SOC Analyst resmi di Indonesia —
+  skema sertifikasi BSSN (SKKNI).</p>
+  <p class="small dim">Hari ini kita bermain peran sebagai <b>L1</b> 😉</p>
+</section>
+
+<!-- Slide 8 -->
+<section>
+  <h2>🪜 Alur Kerja L1 → L2</h2>
+  <p class="flow small">
+    <b>L1</b>: pantau alert <span class="arrow">→</span> triage
+    <span class="arrow">→</span> perlu investigasi? <span class="arrow">→</span> eskalasi tiket ke
+    <b>L2</b>: investigasi mendalam, containment, threat intel
+  </p>
+  <p class="small">Triage harian L1: baca deskripsi &amp; level → identifikasi (siapa/apa/dari mana)
+  → bandingkan aktivitas normal → putuskan: <b class="ok">aman (tutup)</b> / <b class="warn">pantau</b> / <b class="bad">eskalasi ke L2</b></p>
+  <p class="small dim">Di organisasi kecil, satu orang bisa menjalankan keduanya sekaligus.</p>
+</section>
+
+<!-- Slide 9 -->
+<section>
+  <div class="recap">
+    <h3>⚡ Mini-Recap 1</h3>
+    <ul class="tight">
+      <li>SOC = <b>tim</b> penjaga keamanan 24/7 (satpam + CCTV + ranger)</li>
+      <li>Tools utamanya: <b>SIEM</b></li>
+      <li>L1 = first responder: baca alert → putuskan tindakan</li>
+    </ul>
+    <p class="small dim">Coba jawab tanpa lihat: alur kerja L1 itu apa saja? 🤔</p>
+  </div>
+</section>
+
+<!-- Slide 10 -->
+<section>
+  <h2>📊 Apa itu SIEM?</h2>
+  <p><b>S</b>ecurity <b>I</b>nformation and <b>E</b>vent <b>M</b>anagement</p>
+  <ul class="tight">
+    <li>Sistem untuk <b>mengumpulkan</b> log dari semua sumber</li>
+    <li><b>Mengolah</b> menjadi informasi keamanan</li>
+    <li><b>Membunyikan alarm</b> saat ada yang mencurigakan</li>
+  </ul>
+  <p class="blue">Satu tempat untuk melihat SELURUH keadaan keamanan.</p>
+</section>
+
+<!-- Slide 11 -->
+<section>
+  <h2>😩 Masalah Tanpa SIEM</h2>
+  <ul class="tight">
+    <li>50 server = 50 tempat cek log berbeda 😱</li>
+    <li>Format log beda-beda, tidak bisa dibandingkan</li>
+    <li>Serangan menyebar malam hari — siapkan begadang?</li>
+    <li>Bukti insiden tercecer / tertimpa rotasi log</li>
+  </ul>
+  <p class="bad"><b>Hasilnya: kejadian penting terlewat, respon lambat.</b></p>
+</section>
+
+<!-- Slide 12 -->
+<section>
+  <h2>✅ Manfaat SIEM</h2>
+  <ul class="tight">
+    <li><b>Centralized</b> — semua log di satu tempat</li>
+    <li><b>Search</b> — cari kejadian dalam hitungan detik</li>
+    <li><b>Alerting</b> — alarm otomatis saat pola berbahaya</li>
+    <li><b>Correlation</b> — hubungkan kejadian dari banyak sumber</li>
+  </ul>
+</section>
+
+<!-- Slide 13 -->
+<section>
+  <h2>📜 Bonus: Compliance</h2>
+  <p>SIEM juga membantu memenuhi regulasi &amp; audit:</p>
+  <ul class="tight">
+    <li><b>PCI-DSS</b> — standar keamanan kartu pembayaran</li>
+    <li><b>ISO 27001</b> — manajemen keamanan informasi</li>
+    <li><b>GDPR / UU PDP</b> — perlindungan data pribadi</li>
+  </ul>
+  <p class="small dim">Audit butuh bukti monitoring — log terpusat + alert = bukti.</p>
+</section>
+
+<!-- Slide 14 -->
+<section>
+  <h2>🧩 Komponen SIEM (Pipeline)</h2>
+  <p class="flow">
+    <b>Data Collection</b> <span class="arrow">→</span>
+    <b>Parsing/Normalization</b> <span class="arrow">→</span>
+    <b>Storage</b> <span class="arrow">→</span>
+    <b>Analysis</b> <span class="arrow">→</span>
+    <b>Alerting</b>
+  </p>
+  <p class="small dim">Ingat pipeline ini — Wazuh punya padanannya untuk setiap tahap.</p>
+</section>
+
+<!-- Slide 15 -->
+<section>
+  <h2>🦾 Mengapa Wazuh?</h2>
+  <ul class="tight">
+    <li><b>Free &amp; open source</b> — tanpa lisensi</li>
+    <li><b>Cross-platform</b> — Windows, Linux, macOS, Docker, Cloud</li>
+    <li><b>Cocok untuk belajar</b> — install ringan, ada semua fitur SIEM</li>
+    <li><b>Komunitas besar</b> + dokumentasi lengkap</li>
+  </ul>
+  <p class="small dim">Versi lab kita: <span class="mono">4.14.7</span></p>
+</section>
+
+<!-- Slide 16 -->
+<section>
+  <h2>🧱 Komponen Wazuh (1): Agent &amp; Manager</h2>
+  <ul class="tight">
+    <li>📡 <b>Agent</b> — terinstall di device (Windows/Linux),<br>
+        mengumpulkan log &amp; mengirim ke manager</li>
+    <li>🏢 <b>Manager</b> — otaknya: menerima log, menjalankan decoder &amp; rules,<br>
+        memutuskan mana yang jadi alert</li>
+  </ul>
+</section>
+
+<!-- Slide 17 -->
+<section>
+  <h2>🧱 Komponen Wazuh (2): Indexer &amp; Dashboard</h2>
+  <ul class="tight">
+    <li>🗄️ <b>Indexer</b> — database penyimpanan logs &amp; alerts (search engine)</li>
+    <li>🖥️ <b>Dashboard</b> — antarmuka web: lihat, cari, visualisasikan alert</li>
+  </ul>
+  <p class="small dim">Di lab: dashboard di <span class="mono">https://localhost:443</span></p>
+</section>
+
+<!-- Slide 18 -->
+<section>
+  <h2>🔄 Diagram Alur Wazuh</h2>
+  <p class="flow" style="font-size:1em">
+    📡 <b>Agent</b><br>
+    <span class="arrow">↓</span> kirim log<br>
+    🏢 <b>Manager</b> (decoder → rules → alert)<br>
+    <span class="arrow">↓</span> simpan alert<br>
+    🗄️ <b>Indexer</b><br>
+    <span class="arrow">↓</span> tampilkan<br>
+    🖥️ <b>Dashboard</b> <span class="arrow">→</span> 👀 Analyst
+  </p>
+</section>
+
+<!-- Slide 19 -->
+<section>
+  <h2>🗺️ Peta SIEM Pipeline → Wazuh</h2>
+  <table class="qa-table">
+    <tr><td>Data Collection</td><td class="blue"><b>Agent</b></td></tr>
+    <tr><td>Parsing/Normalization</td><td class="blue"><b>Decoder</b> (di Manager)</td></tr>
+    <tr><td>Analysis</td><td class="blue"><b>Rules</b> (di Manager)</td></tr>
+    <tr><td>Storage</td><td class="blue"><b>Indexer</b></td></tr>
+    <tr><td>Alerting + View</td><td class="blue"><b>Dashboard</b></td></tr>
+  </table>
+</section>
+
+<!-- Slide 20 -->
+<section>
+  <div class="recap">
+    <h3>⚡ Mini-Recap 2</h3>
+    <p>Sebutkan urutannya tanpa lihat slide sebelumnya! 🙊</p>
+    <p class="small dim">Agent → Manager → Indexer → Dashboard</p>
+    <p class="small dim">Dan di Manager terjadi 2 hal penting: <b>decoder</b> &amp; <b>rules</b> —
+    materi berikutnya.</p>
+  </div>
+</section>
+
+<!-- Slide 21 -->
+<section>
+  <h2>📦 Fitur 1: Log Collection</h2>
+  <p class="blue"><b>Wazuh Agent = pengumpul log</b></p>
+  <ul class="tight">
+    <li>Install di: Windows, Linux, macOS, Docker, Cloud</li>
+    <li>Satu agent ringan, banyak modul: log, FIM, vuln detection, dll</li>
+    <li>Kirim ke manager secara real-time</li>
+  </ul>
+</section>
+
+<!-- Slide 22 -->
+<section>
+  <h2>📂 Sumber Log yang Dikumpulkan</h2>
+  <div class="two-col small">
+    <div>
+      <p><b>Windows</b></p>
+      <ul class="tight">
+        <li>Event Viewer: Security, System, Application</li>
+        <li>Logon, privilege use, process creation</li>
+      </ul>
+    </div>
+    <div>
+      <p><b>Linux</b></p>
+      <ul class="tight">
+        <li><span class="mono">/var/log/*</span> — auth, syslog, dll</li>
+        <li>Custom logs (file-based)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 23 -->
+<section>
+  <h2>👁️ Demo: Lihat Log di Windows</h2>
+  <ol class="tight">
+    <li>Buka <b>Event Viewer</b> (Win+R → <span class="mono">eventvwr</span>)</li>
+    <li>Windows Logs → <b>Security</b></li>
+    <li>Perhatikan event: <b>logon</b>, <b>privilege use</b>, <b>process creation</b></li>
+  </ol>
+  <p class="small dim">Ribuan entri… bayangkan mencarinya manual di 50 server 😅 —
+  itulah kenapa perlu SIEM.</p>
+</section>
+
+<!-- Slide 24 -->
+<section>
+  <h2>🧭 Kenapa Log Mentah Belum Cukup</h2>
+  <pre class="code"><code>Dec 25 20:45:02 lab-host myapp[1234]: User 'admin' failed login from '192.168.1.100'</code></pre>
+  <ul class="tight">
+    <li>Manusia bisa baca — <b>komputer belum</b></li>
+    <li>Format tiap aplikasi beda-beda</li>
+    <li>Butuh "penerjemah": <b class="blue">decoder</b> → materi berikutnya</li>
+  </ul>
+</section>
+
+<!-- Slide 25 -->
+<section>
+  <h2>📖 Fitur 2: Log Processing — Decoder</h2>
+  <p class="blue"><b>Decoder = penerjemah</b></p>
+  <ul class="tight">
+    <li>Menerjemahkan log mentah → format terstruktur</li>
+    <li>Mengapa perlu? Format log tiap aplikasi beda-beda</li>
+    <li>Tanpa decoder: log hanya tumpukan teks</li>
+  </ul>
+  <p class="small dim">Analogi: penerjemah yang mengubah kalimat acak → data rapi.</p>
+</section>
+
+<!-- Slide 26 -->
+<section>
+  <h2>⚙️ Cara Kerja Decoder (2 Fase)</h2>
+  <p><b>Phase 1 — Pre-decoding</b></p>
+  <ul class="tight small">
+    <li>Ambil: timestamp, hostname, program_name</li>
+    <li>Pisahkan header dari isi log</li>
+  </ul>
+  <p><b>Phase 2 — Decoding</b></p>
+  <ul class="tight small">
+    <li>Cocokkan dengan decoder yang dikenal</li>
+    <li>Ekstrak field: <span class="mono">user</span>, <span class="mono">srcip</span>, <span class="mono">action</span>, …</li>
+  </ul>
+</section>
+
+<!-- Slide 27 -->
+<section>
+  <h2>🎬 DEMO: Simulator Decoder (tanpa install)</h2>
+  <p class="blue"><b>wazuh_logtest_local.html</b> — simulator lokal di browser</p>
+  <ol class="tight small">
+    <li>Masukkan log: <span class="mono">User 'admin' failed login from '192.168.1.100'</span></li>
+    <li>Lihat Phase 1: pre-decoding (timestamp, host, program)</li>
+    <li>Lihat Phase 2: decoder match → field diekstrak</li>
+  </ol>
+  <p class="small dim">🎯 Tujuan: pecah teori XML — lihat dulu "ajaib"-nya, baru bedah cara kerjanya.</p>
+  <p class="small">✨ Fitur simulator: badge <b>Decoded by</b> (decoder mana yang menangkap log) · <b>Generate Rules AI</b> (minta token ke facilitator) · 13 sample log siap pakai · dukungan CEF/LEEF/JSON/custom decoder</p>
+  <p class="small dim">⚠️ Simulator mencakup ±90% skenario pembelajaran. Fitur advanced (decoder <code>offset</code> lanjutan, CDB list, active response) hanya ada di Wazuh asli — gunakan <code>wazuh-logtest</code> di server.</p>
+  <p class="small">🔗 URL simulator:
+  <span class="mono">https://simulator.laptopexp.my.id/wazuh_logtest_local.html</span><br>
+  Lokal (di server workshop): <span class="mono">http://127.0.0.1:8787/wazuh_logtest_local.html</span></p>
+</section>
+
+<!-- Slide 28 -->
+<section>
+  <h2>📜 Contoh Decoder XML (ssh)</h2>
+  <pre class="code"><code>&lt;decoder name="sshd"&gt;
+  &lt;program_name&gt;^sshd&lt;/program_name&gt;
+&lt;/decoder&gt;
+
+&lt;decoder name="sshd-login"&gt;
+  &lt;parent&gt;sshd&lt;/parent&gt;
+  &lt;regex&gt;Failed password for (\w+) from (\d+\.\d+\.\d+\.\d+)&lt;/regex&gt;
+  &lt;order&gt;user, srcip&lt;/order&gt;
+&lt;/decoder&gt;</code></pre>
+</section>
+
+<!-- Slide 29 -->
+<section>
+  <h2>🔍 Membaca Decoder XML Itu</h2>
+  <table class="qa-table">
+    <tr><td><span class="mono">program_name ^sshd</span></td><td>"log dari program sshd adalah milikku"</td></tr>
+    <tr><td><span class="mono">parent</span></td><td>lanjutan dari decoder sshd</td></tr>
+    <tr><td><span class="mono">regex</span></td><td>pola untuk menangkap data (\w+ = kata, \d+ = angka)</td></tr>
+    <tr><td><span class="mono">order</span></td><td>nama field hasil tangkapan, berurutan</td></tr>
+  </table>
+  <p class="small dim">Hasil: <span class="mono">user=admin, srcip=192.168.1.100</span> — siap dipakai rule.</p>
+  <p class="small dim" style="margin-top:10px">💡 Bonus OS_Regex: <code>\p</code> = punctuation · <code>\l</code>/<code>\u</code> = lower/upper · <code>|</code> = alternation · matching <b>case-insensitive</b></p>
+</section>
+
+<!-- Slide 30 -->
+<section>
+  <h2>⚖️ Apa itu Rules?</h2>
+  <p class="blue"><b>Rule = petugas penentu</b> (aman / curiga / berbahaya)</p>
+  <ul class="tight">
+    <li>Aturan deteksi dalam format XML</li>
+    <li>Logika: <b>IF-THIS-THEN-ALERT</b></li>
+    <li>Menggunakan field hasil decoder, bukan teks mentah</li>
+  </ul>
+  <p class="small dim">Decoder membaca, rule memutuskan.</p>
+</section>
+
+<!-- Slide 31 -->
+<section>
+  <h2>🧩 Elemen Rule Penting</h2>
+  <table class="qa-table">
+    <tr><td><span class="mono">id</span></td><td>nomor unik rule (custom: 100000–120000)</td></tr>
+    <tr><td><span class="mono">level</span></td><td>tingkat severity 0–15</td></tr>
+    <tr><td><span class="mono">decoded_as</span></td><td>match jika decoder tertentu cocok</td></tr>
+    <tr><td><span class="mono">field</span></td><td>match nilai field hasil decoder</td></tr>
+    <tr><td><span class="mono">if_sid</span></td><td>match jika rule induk juga match</td></tr>
+    <tr><td><span class="mono">frequency + timeframe</span></td><td>deteksi kejadian BERULANG 🔁</td></tr>
+  </table>
+</section>
+
+<!-- Slide 32 -->
+<section>
+  <h2>📜 Contoh Rule XML</h2>
+  <pre class="code"><code>&lt;rule id="100001" level="5"&gt;
+  &lt;decoded_as&gt;sshd-login&lt;/decoded_as&gt;
+  &lt;field name="action"&gt;failed&lt;/field&gt;
+  &lt;description&gt;SSH login failed&lt;/description&gt;
+  &lt;group&gt;authentication_failed,sshd,&lt;/group&gt;
+&lt;/rule&gt;</code></pre>
+  <p class="small">Artinya: "decoder sshd-login cocok + action=failed → alert level 5"</p>
+</section>
+
+<!-- Slide 33 -->
+<section>
+  <h2>🔁 Frequency Rule: Naikkan Severity</h2>
+  <pre class="code"><code>&lt;rule id="100002" level="10" frequency="8" timeframe="120"&gt;
+  &lt;if_matched_sid&gt;100001&lt;/if_matched_sid&gt;
+  &lt;description&gt;SSHD brute force attempt!&lt;/description&gt;
+&lt;/rule&gt;</code></pre>
+  <p class="blue">"8x gagal login dalam 2 menit dari IP sama → level 10!"</p>
+  <p class="small dim">Inilah yang membedakan 1x salah ketik vs serangan brute force.</p>
+  <p class="small dim">💡 Kurangi noise: <code>&lt;if_fts&gt;</code> = alert hanya untuk kombinasi field yang <b>pertama kali</b> muncul (mis. user baru pertama kali login).</p>
+</section>
+
+<!-- Slide 34 -->
+<section>
+  <h2>📊 Alert Level Severity</h2>
+  <table class="qa-table">
+    <tr><td><span class="badge ok">Level 0</span></td><td>tidak jadi alert (hanya dicatat)</td></tr>
+    <tr><td><span class="badge ok">Level 1–3</span></td><td>informasi</td></tr>
+    <tr><td><span class="badge warn">Level 4–6</span></td><td>rendah</td></tr>
+    <tr><td><span class="badge warn">Level 7–9</span></td><td>sedang</td></tr>
+    <tr><td><span class="badge bad">Level 10–12</span></td><td>tinggi</td></tr>
+    <tr><td><span class="badge crit">Level 13–15</span></td><td>kritikal</td></tr>
+  </table>
+</section>
+
+<!-- Slide 35 -->
+<section>
+  <h2>🧠 Interpretasi Severity</h2>
+  <table class="qa-table">
+    <tr><td>1× gagal login</td><td><span class="badge warn">rendah</span> mungkin salah ketik</td></tr>
+    <tr><td>8× gagal dari IP sama</td><td><span class="badge bad">tinggi</span> indikasi brute force</td></tr>
+    <tr><td>Malware aktif terdeteksi</td><td><span class="badge crit">kritikal</span> respons segera!</td></tr>
+  </table>
+  <p class="small dim">Severity = prioritas perhatian analyst.</p>
+</section>
+
+<!-- Slide 36 -->
+<section>
+  <div class="recap">
+    <h3>⚡ Mini-Recap 3</h3>
+    <ul class="tight">
+      <li><b>Decoder</b> membaca → data rapi</li>
+      <li><b>Rule</b> memutuskan → alert / tidak</li>
+      <li><b>Severity</b> menilai → seberapa serius</li>
+      <li><b>Frequency</b> menaikkan level saat pola berulang</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Slide 37 -->
+<section>
+  <h2>📁 Fitur 3: File Integrity Monitoring (FIM)</h2>
+  <p class="blue"><b>FIM = penjaga lemari arsip</b> 🗄️</p>
+  <ul class="tight">
+    <li>Memantau perubahan file: <b>created, modified, deleted, renamed</b></li>
+    <li>Real-time alert saat file penting berubah</li>
+  </ul>
+</section>
+
+<!-- Slide 38 -->
+<section>
+  <h2>🦠 Perilaku Attacker yang Tertangkap FIM</h2>
+  <ul class="tight">
+    <li><b>Malware</b> menulis file ke system directory</li>
+    <li><b>Persistence</b>: ubah Run keys / buat scheduled task</li>
+    <li><b>Config change</b>: ubah <span class="mono">/etc/passwd</span>, registry Windows</li>
+  </ul>
+  <p class="small dim">Attacker hampir selalu meninggalkan jejak file — FIM menangkapnya.</p>
+</section>
+
+<!-- Slide 39 -->
+<section>
+  <h2>⚙️ Konfigurasi FIM di Wazuh</h2>
+  <pre class="code"><code>&lt;syscheck&gt;
+  &lt;directories realtime="yes"&gt;C:\Windows\System32&lt;/directories&gt;
+  &lt;directories realtime="yes"&gt;/etc,/bin&lt;/directories&gt;
+  &lt;registry&gt;HKLM\SOFTWARE&lt;/registry&gt;
+&lt;/syscheck&gt;</code></pre>
+  <p class="small dim"><span class="mono">realtime="yes"</span> = deteksi saat itu juga, tanpa menunggu scan.</p>
+</section>
+
+<!-- Slide 40 -->
+<section>
+  <h2>🔎 Fitur 4: Vulnerability Detection (intro singkat)</h2>
+  <ul class="tight">
+    <li>Scan kelemahan sistem secara berkala</li>
+    <li>Daftar CVE, missing patches, outdated software</li>
+    <li><b>Proactive</b>: cari lubang SEBELUM dipecahkan orang</li>
+  </ul>
+  <p class="small dim">Banding: FIM &amp; alerting = <b>reactive</b> (setelah kejadian).<br>
+  Cukup 1 screenshot dashboard — tidak ada hands-on untuk fitur ini.</p>
+</section>
+
+<!-- Slide 41 -->
+<section>
+  <h2>🛠️ PRAKTIKUM 1: Agent Installation</h2>
+  <p class="blue">Target: Windows + Wazuh Manager (di WSL) terhubung</p>
+  <p class="flow">Cek hostname <span class="arrow">→</span> add agent di manager
+  <span class="arrow">→</span> install .msi <span class="arrow">→</span> konfigurasi GUI
+  <span class="arrow">→</span> verifikasi</p>
+  <p class="small dim">Waktu: 20 menit · sisakan 5 menit buffer untuk masalah tak terduga</p>
+</section>
+
+<!-- Slide 42 -->
+<section>
+  <h2>0️⃣ Prasyarat + Cek Hostname</h2>
+  <ul class="tight small">
+    <li>Wazuh Manager sudah berjalan</li>
+    <li>Alamat manager diketahui (localhost / hostname / IP)</li>
+    <li>Agent key siap di-extract dari manager</li>
+  </ul>
+  <p><b>Cek nama komputer Windows</b> (dipakai sebagai Agent name):</p>
+  <pre class="code"><code>:: Command Prompt
+hostname
+
+:: PowerShell
+$env:COMPUTERNAME
+
+:: GUI: Win+R -&gt; sysdm.cpl -&gt; Computer Name</code></pre>
+</section>
+
+<!-- Slide 43 -->
+<section>
+  <h2>1️⃣ Add Agent + Extract Key di Manager</h2>
+  <pre class="code"><code>cd /var/ossec/bin
+sudo ./manage_agents
+
+[A] Add new agent
+   Agent name: WINDOWS-PC   (WAJIB = hostname Windows)
+   Agent IP  : any          (disarankan untuk lab)
+[E] Extract key  -&gt; copy key
+[Q] Quit</code></pre>
+  <p class="small dim"><span class="mono">any</span> = agent boleh konek dari IP mana pun — paling mudah untuk lab.</p>
+</section>
+
+<!-- Slide 44 -->
+<section>
+  <h2>2️⃣ Download + Install di Windows</h2>
+  <p>Paste di browser (versi konsisten dengan lab):</p>
+  <pre class="code"><code>https://packages.wazuh.com/4.x/windows/wazuh-agent-4.14.7-1.msi</code></pre>
+  <ul class="tight small">
+    <li>Installer: Next → Accept → Next → Install → Finish</li>
+    <li><b class="bad">Jebakan pemula:</b> saat install TIDAK perlu isi address/key!<br>Konfigurasi dilakukan SETELAH install via GUI (slide berikut)</li>
+    <li>Install gagal? → jalankan installer sebagai <b>Administrator</b></li>
+  </ul>
+</section>
+
+<!-- Slide 45 -->
+<section>
+  <h2>3️⃣ Konfigurasi via Agent GUI (win32ui)</h2>
+  <p>Buka: <span class="mono">C:\Program Files (x86)\ossec-agent\win32ui.exe</span></p>
+  <ul class="tight">
+    <li>Isi <b>Manager address</b>: localhost (atau hostname/IP server)</li>
+    <li>Paste <b>Key</b> hasil extract</li>
+    <li>Klik <b>Connect</b></li>
+  </ul>
+  <p class="small">Verifikasi service (namanya <b>WazuhSvc</b>):</p>
+  <pre class="code"><code>Get-Service *wazuh*   # Status: Running</code></pre>
+  <div style="text-align:center">
+    <img src="wazuh_agent_win32ui.png" alt="Wazuh Agent GUI (win32ui)"
+         style="height:340px;border:1px solid #30363d;border-radius:10px">
+    <p class="small dim">Tampilan win32ui: isi Manager IP + Authentication key → Save.
+    Status "Auth key not imported" = key belum dipaste.</p>
+  </div>
+</section>
+
+<!-- Slide 46 -->
+<section>
+  <h2>4️⃣ Verifikasi + Manajemen Service</h2>
+  <p>Dashboard → <b>Agents</b> → Status: <span class="ok"><b>Active</b> (green) ✅</span></p>
+  <table class="qa-table small">
+    <tr><td>Tidak konek / habis edit config</td><td><b>Restart</b></td></tr>
+    <tr><td>Agent macet</td><td>Stop → Start (fresh)</td></tr>
+  </table>
+  <pre class="code"><code>Start-Service / Stop-Service / Restart-Service -Name "WazuhSvc"
+type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
+  <p class="small dim">Auto-start default aktif · GUI win32ui: Overview, Management, Settings, Logs, About</p>
+</section>
+
+<!-- Slide 47 -->
+<section>
+  <h2>🔧 Troubleshooting Cepat</h2>
+  <table class="qa-table small">
+    <tr><td>IP WSL berubah setelah reboot</td><td>cek <span class="mono">ip addr</span> di WSL → update <span class="mono">server=</span> di ossec.conf</td></tr>
+    <tr><td>Firewall blokir port 1514</td><td>allow inbound TCP 1514</td></tr>
+    <tr><td>Key invalid</td><td>hapus agent di manager → add baru → extract lagi</td></tr>
+    <tr><td>Status Disconnected</td><td>cek manager jalan → restart service</td></tr>
+    <tr><td>Install gagal</td><td>run as Administrator</td></tr>
+  </table>
+</section>
+
+<!-- Slide 48 -->
+<section>
+  <h2>🖥️ PRAKTIKUM 2: Dashboard Operations</h2>
+  <p>Buka <span class="mono">https://localhost:443</span> → jelajahi menu:</p>
+  <ul class="tight">
+    <li><b>Agents</b> — daftar &amp; status agent</li>
+    <li><b>Security Events</b> — alert yang masuk</li>
+    <li><b>Discovery</b> — pencarian log mendalam ⭐ (dipakai di Sesi II)</li>
+    <li><b>Inventory</b> — data hardware/software tiap agent</li>
+  </ul>
+</section>
+
+<!-- Slide 49 -->
+<section>
+  <h2>🔎 Basic Query di Discover</h2>
+  <p>Nama field yang sering dipakai:</p>
+  <table class="qa-table small">
+    <tr><td><span class="mono">srcip</span></td><td>IP sumber</td></tr>
+    <tr><td><span class="mono">user</span></td><td>username yang terlibat</td></tr>
+    <tr><td><span class="mono">rule.level</span></td><td>tingkat severity alert</td></tr>
+    <tr><td><span class="mono">rule.groups</span></td><td>kategori rule (authentication_failed, dll)</td></tr>
+  </table>
+  <p>Contoh: <span class="mono">srcip:192.168.1.1</span> · <span class="mono">user:admin</span></p>
+</section>
+
+<!-- Slide 50 -->
+<section>
+  <h2>💾 Filter + Save Query</h2>
+  <ul class="tight">
+    <li>Set <b>time range</b> (24 jam / 7 hari / custom)</li>
+    <li>Filter level: <span class="mono">rule.level:&gt;=5</span></li>
+    <li><b>Save query</b> untuk dipakai harian — contoh nanti: <span class="mono">"BruteForce SSH"</span> ⭐</li>
+  </ul>
+  <p class="small dim">Analist hebat = punya kumpulan query siap pakai.</p>
+</section>
+
+<!-- Slide 51 -->
+<section>
+  <div class="recap">
+    <h3>⚡ Akhir Sesi I — Yang Sudah Kita Pelajari</h3>
+    <ul class="tight small">
+      <li>SOC = tim jaga 24/7 · SIEM = kumpul+analisis log · <b>Wazuh</b> = SIEM open source</li>
+      <li>Alur: <b>Agent → Manager (decoder+rules) → Indexer → Dashboard</b></li>
+      <li>4 fitur: Log Collection, Log Processing, FIM, Vulnerability Detection</li>
+      <li>Praktikum: agent online + dashboard + query dasar</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Slide 52 -->
+<section>
+  <h2>☕ ISTIRAHAT + ISHOMA</h2>
+  <h3>12.01 – 13.01 (60 menit)</h3>
+  <p class="dim">Sesi II: Praktikum serangan + kasus nyata — kembali tepat waktu! ⏰</p>
+</section>
+
+<!-- Slide 53 -->
+<section>
+  <h2>🎯 Sesi II: Praktikum Attack Simulation</h2>
+  <ul class="tight">
+    <li>Review singkat 4 fitur Sesi I</li>
+    <li>Preview: <b>3 kasus</b> — 2 simulasi hands-on + 1 kasus nyata</li>
+  </ul>
+  <p class="blue">Prinsip: <b>lebih baik 3 kasus dipahami daripada 5 terburu-buru.</b></p>
+</section>
+
+<!-- Slide 54 -->
+<section>
+  <div class="etika">
+    <h2>⚖️ ETIKA — WAJIB DIPAHAMI</h2>
+    <p><b>Semua simulasi attack HANYA di lab milik sendiri.</b></p>
+    <p>Mencoba ke sistem orang lain <b>TANPA IZIN</b> adalah tindakan ileal (UU ITE &amp; hukum pidana komputer).</p>
+    <p class="blue"><b>Jadilah defender yang bertanggung jawab.</b></p>
+  </div>
+</section>
+
+<!-- Slide 55 -->
+<section>
+  <h2>💻 Attack 1: PowerShell Log Visibility</h2>
+  <table class="qa-table small">
+    <tr><td>Target</td><td>Windows</td></tr>
+    <tr><td>Attacker</td><td>Windows lokal (via PowerShell)</td></tr>
+    <tr><td>Fitur Wazuh</td><td>Log Collection (Windows Event Viewer)</td></tr>
+    <tr><td>Konsep</td><td class="blue"><b>VISIBILITY</b> — apa yang diketik, terlihat</td></tr>
+  </table>
+  <p class="small dim">Durasi: 12 menit</p>
+</section>
+
+<!-- Slide 56 -->
+<section>
+  <h2>🎯 Konsep VISIBILITY</h2>
+  <p class="flow">
+    Ketik command di PowerShell <span class="arrow">→</span> tercatat di Event Viewer (Event 4104)
+    <span class="arrow">→</span> agent kirim ke Wazuh <span class="arrow">→</span> muncul di Dashboard
+  </p>
+  <p>Command yang dicoba: <span class="mono">ping</span> · <span class="mono">ipconfig</span> ·
+  <span class="mono">whoami</span> · <span class="mono">dir</span></p>
+  <p class="small dim">Pelajaran: attacker mengetik sesuatu — dan SEMUANYA meninggalkan jejak.</p>
+</section>
+
+<!-- Slide 57 -->
+<section>
+  <h2>🧪 Langkah Attack 1</h2>
+  <ol class="tight small">
+    <li>Buka PowerShell, jalankan: <span class="mono">ping google.com</span>, <span class="mono">whoami</span>, <span class="mono">dir</span></li>
+    <li>Buka Event Viewer → Applications and Services Logs → Windows PowerShell</li>
+    <li>Cari <b>Event 4104</b> — bandingkan dengan yang diketik</li>
+    <li>Buka Wazuh Dashboard → cari event dari agent Windows</li>
+  </ol>
+  <p class="small dim">Prasyarat: Script Block Logging aktif (slide persiapan).</p>
+</section>
+
+<!-- Slide 58 -->
+<section>
+  <h2>📁 Attack 2: File Creation (FIM)</h2>
+  <table class="qa-table small">
+    <tr><td>Target</td><td>Windows</td></tr>
+    <tr><td>Attacker</td><td>Windows lokal</td></tr>
+    <tr><td>Fitur Wazuh</td><td><b>FIM</b> — File Integrity Monitoring</td></tr>
+    <tr><td>Detection</td><td>File created di Temp/System</td></tr>
+  </table>
+  <p class="small dim">Durasi: 10 menit</p>
+</section>
+
+<!-- Slide 59 -->
+<section>
+  <h2>🧪 Langkah Attack 2</h2>
+  <ol class="tight small">
+    <li>Buat file test di folder yang dimonitor:<br>
+    <span class="mono">echo test &gt; %TEMP%\lab-fim-test.txt</span></li>
+    <li>Buka Wazuh Dashboard → Security Events</li>
+    <li>Cari alert FIM → baca detail: <b>file path, timestamp, checksum</b></li>
+  </ol>
+  <p class="small dim">Malware membuat file → FIM menangkap → analyst tahu lebih cepat.</p>
+</section>
+
+<!-- Slide 60 -->
+<section>
+  <h2>⭐ Attack 3: Brute Force SSH — Praktikum Uji Coba</h2>
+  <p>Kita <b>lakukan sendiri</b> di lab — bukan menonton kasus orang lain.</p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>🎯 Target</td><td>Server lab milik sendiri (Wazuh manager)</td></tr>
+    <tr><td>🎬 Peran kita</td><td>Sebagai "penyerang" yang mencoba login SSH berkali-kali</td></tr>
+    <tr><td>👁️ Yang kita amati</td><td>Bagaimana Wazuh menangkap pola brute force</td></tr>
+  </table>
+  <p class="small dim">⚠️ Semua pengujian HANYA ke server sendiri — menyerang sistem orang lain tanpa izin = ilegal.</p>
+</section>
+
+<!-- Slide 61 -->
+<section>
+  <h2>🧪 Langkah Uji Coba — Bertahap</h2>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Persiapan</td><td>Pastikan Wazuh agent aktif & SSH service berjalan di target. Buka terminal di mesin penyerang.</td></tr>
+    <tr><td>2️⃣ Serangan sederhana</td><td>Coba login SSH salah password 3–5× manual:<br><code>ssh admin@&lt;ip-target&gt;</code> (ketik password salah berulang)</td></tr>
+    <tr><td>3️⃣ Lihat di log server</td><td><code>sudo grep "Failed password" /var/log/secure</code></td></tr>
+    <tr><td>4️⃣ Lihat di Wazuh</td><td>Dashboard → Discover → filter <code>rule.groups:authentication_failed</code></td></tr>
+    <tr><td>5️⃣ Level naik?</td><td>Tambah frekuensi percobaan → amati rule frequency menaikkan severity</td></tr>
+  </table>
+</section>
+
+<!-- Slide 62 -->
+<section>
+  <h2>🎭 Level Lanjut: Ganti-Ganti IP (Distributed)</h2>
+  <p class="small">Penyerang sungguhan tidak pakai 1 IP — kita simulasikan dengan Tor:</p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Jalankan script lab (v3.5.0)</td><td><code>./simulate_bruteforce.sh --host &lt;ip&gt; --count 5 --mode tor</code><br><span class="small dim">5 IP berbeda via Tor · ringkasan terverifikasi log server</span></td></tr>
+    <tr><td>2️⃣ Gerbang etika</td><td>Ketik <code>SAYA PUNYA IZIN</code> (pengingat: server milik sendiri!)</td></tr>
+    <tr><td>3️⃣ Amati output</td><td>Setiap iterasi = IP berbeda, login gagal, ringkasan terverifikasi log</td></tr>
+    <tr><td>4️⃣ Verifikasi server</td><td><code>grep "Failed password" /var/log/secure | tail -5</code> → IP-IP Tor berbeda</td></tr>
+    <tr><td>5️⃣ Di Wazuh</td><td>Banyak IP berbeda, 1–2 percobaan per IP = pola distributed brute force</td></tr>
+  </table>
+</section>
+
+<!-- Slide 63 -->
+<section>
+  <h2>🔍 Yang Diamati dari Alert</h2>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>Rule yang terpicu</td><td><code>sshd: authentication failed</code> (level 5)</td></tr>
+    <tr><td>Frequency rule</td><td>Banyak percobaan → naik ke level 10+ (group <code>authentication_failures</code>)</td></tr>
+    <tr><td>Field penting</td><td><code>srcip</code> (asal), <code>dstuser</code> (user dicoba), <code>rule.firedtimes</code></td></tr>
+    <tr><td>Pola distributed</td><td>Banyak IP berbeda × sedikit percobaan per IP = botnet, bukan manusia</td></tr>
+    <tr><td>MITRE ATT&CK</td><td>T1110 Password Guessing / Brute Force</td></tr>
+  </table>
+</section>
+
+<!-- Slide 64 -->
+<section>
+  <h2>🧪 Aktivitas Peserta — Attack 3</h2>
+  <ol class="tight small">
+    <li>Ikuti langkah 1–5 (serangan sederhana) di lab masing-masing / berpasangan</li>
+    <li>Catat: berapa percobaan sebelum Wazuh memicu rule frequency?</li>
+    <li>Coba Level Lanjut (ganti IP) — amati perbedaan pola di dashboard</li>
+    <li>Diskusi kelompok kecil: kalau kalian L1 analyst — <b>block / investigate / dismiss</b>? Kenapa?</li>
+  </ol>
+  <p class="small dim">💡 Tunjukkan bukti: screenshot alert kalian sendiri, bukan punya orang lain.</p>
+</section>
+
+<!-- Slide 65 -->
+<section>
+  <h2>🔍 Log Analysis — Bahas Bersama</h2>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>Query dasar</td><td><code>rule.groups:authentication_failed</code></td></tr>
+    <tr><td>Fokus level</td><td><code>rule.level:&gt;=5</code></td></tr>
+    <tr><td>Group by</td><td><code>source.ip</code> / level / time · filter by agent</td></tr>
+    <tr><td>Interpretasi</td><td>Banyak IP × percobaan berulang = serangan → next step</td></tr>
+  </table>
+  <p class="small dim">⚠️ Verifikasi selalu ke log server / dashboard — jangan percaya klaim tanpa bukti.</p>
+</section>
+
+<!-- Slide 66 -->
+<section>
+  <h2>🚨 Handling Alert: JANGAN PANIK — 7 Langkah</h2>
+  <ol class="tight small">
+    <li>Baca description alert</li>
+    <li>Cek severity level</li>
+    <li>Identifikasi: user, source IP, host, waktu</li>
+    <li>Cek apakah event berulang</li>
+    <li>Bandingkan dengan aktivitas normal</li>
+    <li>Putuskan: false positive atau insiden nyata?</li>
+    <li>Ambil tindakan sesuai risiko</li>
+  </ol>
+</section>
+
+<!-- Slide 67 -->
+<section>
+  <h2>🛡️ Mitigasi Brute Force</h2>
+  <div class="two-col small">
+    <div>
+      <p><b>Menangani alert dari praktikum</b></p>
+      <ul class="tight">
+        <li>Hitung percobaan per IP → blokir agresif (firewall/fail2ban)</li>
+        <li>Cek login BERHASIL? → insiden! reset password</li>
+      </ul>
+    </div>
+    <div>
+      <p><b>Mitigasi jangka panjang</b></p>
+      <ul class="tight">
+        <li>SSH key, matikan password auth</li>
+        <li>Fail2ban / rate limiting</li>
+        <li>MFA admin · disable root login</li>
+      </ul>
+    </div>
+  </div>
+  <p class="small dim">Banyak alert = pertahanan BEKERJA — tetap verifikasi tidak ada yang lolos.</p>
+</section>
+
+<!-- Slide 68 -->
+<section class="title-slide">
+  <h2>🎓 Kesimpulan</h2>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>📖 Decoder</td><td>"Log ini berisi apa?"</td></tr>
+    <tr><td>⚖️ Rule</td><td>"Apakah ini penting?"</td></tr>
+    <tr><td>📊 Severity</td><td>"Seberapa serius?"</td></tr>
+    <tr><td>🚨 Handling</td><td>"Apa yang dilakukan sekarang?"</td></tr>
+    <tr><td>🛡️ Mitigasi</td><td>"Bagaimana mencegahnya terulang?"</td></tr>
+  </table>
+  <p class="small dim">Next steps: install di lab sendiri · <span class="mono">https://simulator.laptopexp.my.id/wazuh_logtest_local.html</span> · panduan add-agent: github.com/ochyx94/wazuh</p>
+  <h3 class="blue">🙏 Terima kasih — Q&amp;A!</h3>
+</section>
+
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+<script>
+  Reveal.initialize({ hash: true, slideNumber: 'c/t', transition: 'slide', width: 1280, height: 720, margin: 0.06 });
+</script>
+</body>
+</html>
