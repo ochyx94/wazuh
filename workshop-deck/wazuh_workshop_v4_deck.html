@@ -934,18 +934,19 @@ PSDrive  : HKLM</code></pre>
 </section>
 <!-- Slide: custom rule powershell manager -->
 <!-- Slide: custom rule powershell manager -->
+<!-- Slide: custom rule powershell manager -->
 <section>
   <h2>📏 Buat Rule di Manager: Event → Alert</h2>
-  <p class="small">Secara bawaan, Wazuh hanya memberi <b>alert</b> untuk command berbahaya yang dikenali (mis. Base64, screen capture). Command biasa seperti <code>whoami</code> hanya jadi <b>event</b> (level 0) — tidak muncul di dashboard. Kita buat 1 rule sendiri: <b>semua command PowerShell = alert</b>.</p>
+  <p class="small">Secara bawaan, Wazuh hanya memberi <b>alert</b> untuk command berbahaya yang dikenali. Command biasa seperti <code>whoami</code> hanya jadi <b>event</b> (level 0) — tidak muncul di dashboard. Kita buat 1 rule sendiri: <b>semua command PowerShell = alert</b>.</p>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Cek nama distro WSL</td><td>PowerShell: <code>wsl -l -v</code> → catat kolom NAME (mis. <span class="mono">Ubuntu</span>)</td></tr>
-    <tr><td>2️⃣ Buka file rule via Explorer</td><td>File Explorer → address bar ketik: <code>\\wsl.localhost\Ubuntu\var\ossec\etc\rules\</code> → Enter → klik kanan <code>local_rules.xml</code> → Open with → <b>Notepad</b></td></tr>
-    <tr><td>3️⃣ Tambah rule</td><td>Scroll ke paling bawah, tempel blok di bawah → Ctrl+S → tutup Notepad<br><code>&lt;group name="powershell,"&gt;</code><br><code>&nbsp;&nbsp;&lt;rule id="100620" level="3"&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;if_sid&gt;91802&lt;/if_sid&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;description&gt;PowerShell command executed (Script Block Logging)&lt;/description&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;mitre&gt;&lt;id&gt;T1059.001&lt;/id&gt;&lt;/mitre&gt;</code><br><code>&nbsp;&nbsp;&lt;/rule&gt;</code><br><code>&lt;/group&gt;</code></td></tr>
-    <tr><td>4️⃣ Restart manager</td><td>Buka terminal WSL (Start → ketik <b>Ubuntu</b> → Enter) → ketik: <code>sudo /var/ossec/bin/wazuh-control restart</code> → masukkan password Linux-mu</td></tr>
-    <tr><td>5️⃣ Cek rule di dashboard</td><td>Wazuh dashboard (browser) → menu ☰ → <b>Management</b> → <b>Rules</b> → ketik <code>100620</code> di search → rule muncul berstatus aktif ✅ <span class="dim">(dashboard hanya bisa melihat rule, tidak bisa membuat — karena itu langkah 2–3 lewat file)</span></td></tr>
+    <tr><td>1️⃣ Buka editor rule (2 cara)</td><td><b>Cara GUI:</b> login dashboard sebagai <b>admin</b> → menu ☰ → <b>Server management</b> → <b>Rules</b> → buka editor custom rules (XML)<br><b>Cara file:</b> Explorer → <code>\\wsl.localhost\Ubuntu\var\ossec\etc\rules\</code> → buka <code>local_rules.xml</code> dgn Notepad</td></tr>
+    <tr><td>2️⃣ Tambah rule</td><td>Tempel di akhir file/editor → Save (GUI) atau Ctrl+S (file):<br><code>&lt;group name="powershell,"&gt;</code><br><code>&nbsp;&nbsp;&lt;rule id="100620" level="3"&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;if_sid&gt;91802&lt;/if_sid&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;description&gt;PowerShell command executed (Script Block Logging)&lt;/description&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;mitre&gt;&lt;id&gt;T1059.001&lt;/id&gt;&lt;/mitre&gt;</code><br><code>&nbsp;&nbsp;&lt;/rule&gt;</code><br><code>&lt;/group&gt;</code></td></tr>
+    <tr><td>3️⃣ Restart manager</td><td>GUI: dashboard biasa menawarkan tombol restart setelah Save · Terminal WSL: <code>sudo /var/ossec/bin/wazuh-control restart</code></td></tr>
+    <tr><td>4️⃣ Verifikasi rule</td><td>Dashboard → <b>Server management → Rules</b> → search <code>100620</code> → muncul &amp; aktif ✅</td></tr>
+    <tr><td>5️⃣ (Bonus) Ruleset Test</td><td>Halaman yang sama → <b>Ruleset Test</b> → paste <b>JSON saja</b> (mulai dari <code>{"win":...}</code>, <b>tanpa</b> prefix waktu) → lihat rule yang match langsung di browser</td></tr>
     <tr><td>6️⃣ Uji lengkap</td><td>PowerShell <b>baru</b> → ketik <code>whoami</code> → tunggu ±1 menit → dashboard → Discover → <code>rule.groups:powershell</code> → muncul alert "PowerShell command executed" ✅</td></tr>
   </table>
-  <p class="small dim">💡 Setelah rule ini aktif, <b>tidak perlu logall</b> — alert langsung masuk dashboard &amp; alerts.json. 📌 Konsep penting: <b>event ≠ alert</b>. Event = catatan mentah; alert = catatan yang dinilai penting oleh rule. Sniffer menangkap semua (event), tapi satpam yang menentukan mana yang diumumkan (alert). ID rule custom bebas 100000–120000, jangan pakai yang sudah ada.</p>
+  <p class="small dim">💡 Setelah rule aktif, <b>tidak perlu logall</b> — alert langsung masuk dashboard. 📌 Konsep: <b>event ≠ alert</b> — CCTV merekam semua, satpam yang menentukan mana diumumkan. ID custom bebas 100000–120000.</p>
 </section>
 
 
