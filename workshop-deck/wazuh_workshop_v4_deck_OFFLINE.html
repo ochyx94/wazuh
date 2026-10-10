@@ -343,7 +343,7 @@
     <span class="varrow">→</span>
     <div class="vbox"><span class="icon">🖥️</span><span class="lbl">Dashboard</span><div class="sub">👀 Analyst</div></div>
   </div>
-  <p class="small dim">Pipeline SIEM slide 14 = kenyataan di Wazuh.</p>
+  <p class="small dim">Pipeline SIEM slide 15 = kenyataan di Wazuh.</p>
 </section>
 
 <!-- Slide 19 -->
@@ -809,7 +809,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <tr><td>Target</td><td>Windows</td></tr>
     <tr><td>Attacker</td><td>Windows lokal</td></tr>
     <tr><td>Fitur Wazuh</td><td><b>FIM</b> — File Integrity Monitoring</td></tr>
-    <tr><td>Detection</td><td>File created di Temp/System</td></tr>
+    <tr><td>Detection</td><td>File created di Desktop</td></tr>
   </table>
   <p class="small dim">Durasi: 10 menit</p>
 </section>
@@ -836,7 +836,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <tr><td>3️⃣ Cari bagian syscheck</td><td>Ctrl+F → ketik <code>&lt;syscheck&gt;</code> → Enter</td></tr>
     <tr><td>4️⃣ Ganti folder dipantau</td><td>Di antara <code>&lt;syscheck&gt;</code> dan <code>&lt;/syscheck&gt;</code>, tulis (ganti NAMA_KAMU = hasil langkah 1):<br><code>&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Desktop&lt;/directories&gt;</code></td></tr>
     <tr><td>5️⃣ Simpan</td><td>Ctrl+S (kalau gagal save → file masih bukan Administrator)</td></tr>
-    <tr><td>6️⃣ Restart agent</td><td>PowerShell (Admin): <code>Restart-Service -Name "Wazuh"</code></td></tr>
+    <tr><td>6️⃣ Restart agent</td><td>PowerShell (Admin): <code>Restart-Service -Name "WazuhSvc"</code></td></tr>
   </table>
   <p class="small dim">✅ Selesai — FIM aktif memantau Desktop-mu. Lanjut ke langkah 5️⃣ Verifikasi.</p>
 </section>
@@ -895,7 +895,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 
 <section>
   <h2>🧪 Langkah Attack 2 — PowerShell</h2>
-  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 60.</p>
+  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63.</p>
   <table class="qa-table small" style="text-align:left">
     <tr><td>1️⃣ Buka PowerShell</td><td>Start → ketik "powershell" → klik <b>Windows PowerShell</b></td></tr>
     <tr><td>2️⃣ Jalankan 3 command</td><td>Ketik satu per satu, tekan Enter setelahnya:<br>
@@ -931,6 +931,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <tr><td>4️⃣ Lihat di Wazuh</td><td>Dashboard → Discover → filter <code>rule.groups:authentication_failed</code></td></tr>
     <tr><td>5️⃣ Level naik?</td><td>Tambah frekuensi percobaan → amati rule frequency menaikkan severity</td></tr>
   </table>
+  <p class="small dim">💡 Rule frequency memicu level 10 setelah ±8x kegagalan dalam 2 menit — uji coba 3–5× belum cukup. Lanjutkan sampai terpicu atau lihat Level Lanjut.</p>
 </section>
 
 <!-- Slide 62 -->
@@ -938,7 +939,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
   <h2>🎭 Level Lanjut: Ganti-Ganti IP (Distributed)</h2>
   <p class="small">Penyerang sungguhan tidak pakai 1 IP — kita simulasikan dengan Tor:</p>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Jalankan script lab (v3.5.0)</td><td><code>./simulate_bruteforce.sh --host &lt;ip&gt; --count 5 --mode tor</code><br><span class="small dim">5 IP berbeda via Tor · ringkasan terverifikasi log server</span></td></tr>
+    <tr><td>1️⃣ Jalankan script lab (v3.5.0)</td><td><code>./simulate_bruteforce.sh --host &lt;ip&gt; --count 5 --mode tor</code><br><span class="small dim">Script di paket workshop (folder <span class="mono">scripts/</span>) — dari facilitator · 5 IP berbeda via Tor · ringkasan terverifikasi log server</span></td></tr>
     <tr><td>2️⃣ Gerbang etika</td><td>Ketik <code>SAYA PUNYA IZIN</code> (pengingat: server milik sendiri!)</td></tr>
     <tr><td>3️⃣ Amati output</td><td>Setiap iterasi = IP berbeda, login gagal, ringkasan terverifikasi log</td></tr>
     <tr><td>4️⃣ Verifikasi server</td><td><code>grep "Failed password" /var/log/secure | tail -5</code> → IP-IP Tor berbeda</td></tr>
@@ -1017,7 +1018,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <tr><td>🚨 Handling</td><td>"Apa yang dilakukan sekarang?"</td></tr>
     <tr><td>🛡️ Mitigasi</td><td>"Bagaimana mencegahnya terulang?"</td></tr>
   </table>
-  <p class="small dim">Next steps: install di lab sendiri · <span class="mono">https://simulator.laptopexp.my.id/wazuh_logtest_local.html</span> · panduan add-agent: github.com/ochyx94/wazuh</p>
+  <p class="small dim">Next steps: install di lab sendiri · <span class="mono">https://simulator.laptopexp.my.id/wazuh_logtest_local.html</span> · panduan lengkap: paket workshop (zip offline) dari facilitator</p>
   <h3 class="blue">🙏 Terima kasih — Q&amp;A!</h3>
 </section>
 
