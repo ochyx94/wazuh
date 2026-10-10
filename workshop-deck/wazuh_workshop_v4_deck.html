@@ -37,6 +37,14 @@
   }
   pre.code code { font-family: monospace; }
   table.qa-table { font-size: 0.82em; border-collapse: collapse; width: 100%; }
+  table.qa-table.tiny { font-size: 0.68em; }
+  table.qa-table.tiny td { padding: 0.35em 0.6em; }
+  section.padat table.qa-table { font-size: 0.62em; }
+  section.padat table.qa-table td { padding: 0.3em 0.5em; }
+  section.padat pre.code { font-size: 0.48em !important; }
+  section.padat p { margin: 0.35em 0; }
+  section.padat p.small { font-size: 0.62em; }
+  section.padat h2 { font-size: 1.1em; }
   /* [v4.1] Visual components */
   .vflow { display: flex; align-items: center; justify-content: center; gap: 0.4em; margin: 0.7em 0; flex-wrap: wrap; }
   .vbox { background: #161b22; border: 2px solid var(--wazuh-blue); border-radius: 10px;
@@ -295,7 +303,7 @@
 </section>
 <section>
   <h2>🧩 Beberapa Fitur Wazuh</h2>
-  <p class="small dim"><b>Fitur = kemampuan yang bisa dilakukan Wazuh</b> — diambil dari use cases resmi wazuh.com; masih ada banyak lainnya (incident response, compliance, IT hygiene, containers security, dll). Alert kita nanti juga dipetakan ke <b>MITRE ATT&amp;CK</b>.</p>
+  <p class="small dim"><b>Fitur = kemampuan Wazuh</b> — dari use cases resmi wazuh.com (masih banyak lainnya). Alert kita dipetakan ke <b>MITRE ATT&amp;CK</b>.</p>
   <div class="vgrid">
     <div class="vcard"><span class="icon">⚙️</span><b>Configuration Assessment</b><div class="sub">audit konfigurasi keamanan (SCA)</div></div>
     <div class="vcard vok"><span class="icon">🦠</span><b>Malware Detection</b><div class="sub">indikator kompromi &amp; malware <span class="hl">← praktikum</span></div></div>
@@ -595,18 +603,15 @@
   <p class="small dim">Ganti <span class="mono">NAMA_KAMU</span> dgn username Windows-mu. <span class="mono">realtime="yes"</span> = deteksi saat itu juga. Config ini disimpan di <span class="mono">ossec.conf</span> agent.</p>
 </section>
 <!-- Slide baru: cara kerja deteksi FIM -->
+<!-- Slide: cara FIM mendeteksi -->
 <section>
   <h2>🔍 Cara FIM Mendeteksi</h2>
-  <div class="vflow">
-    <div class="vbox"><span class="icon">📸</span><span class="lbl">1. Baseline</span><div class="sub">scan pertama: catat "kamus" semua file — ukuran, waktu, hash (MD5/SHA1/SHA256)</div></div>
-    <span class="varrow">→</span>
-    <div class="vbox"><span class="icon">👁️</span><span class="lbl">2. Pantau realtime</span><div class="sub">Windows API tahu langsung saat file dibuat/diubah/dihapus</div></div>
-    <span class="varrow">→</span>
-    <div class="vbox"><span class="icon">⚖️</span><span class="lbl">3. Bandingkan</span><div class="sub">attribute file sekarang vs kamus — beda? itu kejadian</div></div>
-    <span class="varrow">→</span>
-    <div class="vbox"><span class="icon">🚨</span><span class="lbl">4. Alert ke Manager</span><div class="sub">rule 554 file added · 550 file modified · 553 file deleted</div></div>
-  </div>
-  <p class="small dim">💬 Cek di agent setelah config: <span class="mono">C:\Program Files (x86)\ossec-agent\queue\diff\</span> berisi baseline FIM → syscheck aktif.</p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>📸 1. Baseline</td><td>scan pertama: catat "kamus" semua file — ukuran, waktu, hash (MD5/SHA1/SHA256)</td></tr>
+    <tr><td>👁️ 2. Pantau realtime</td><td>Windows API tahu langsung saat file dibuat/diubah/dihapus</td></tr>
+    <tr><td>⚖️ 3. Bandingkan</td><td>attribute file sekarang vs kamus — beda? itu kejadian</td></tr>
+    <tr><td>🚨 4. Alert ke Manager</td><td>rule 554 file added · 550 file modified · 553 file deleted</td></tr>
+  </table>
 </section>
 
 <!-- Slide 40 -->
@@ -676,16 +681,11 @@ sudo ./manage_agents
 </section>
 <section>
   <h2>3️⃣ Konfigurasi via Agent GUI (win32ui)</h2>
-  <p class="small" style="margin:0.3em 0">Buka: <span class="mono">C:\...\ossec-agent\win32ui.exe</span></p>
-  <ul class="tight" style="font-size:0.75em">
-    <li>Isi <b>Manager address</b>: localhost</li>
-    <li>Paste <b>Key</b> hasil extract</li>
-    <li>Klik <b>Connect</b></li>
-  </ul>
+  <p class="small" style="margin:0.3em 0">Buka: <span class="mono">win32ui.exe</span> → isi <b>Manager address</b>: localhost → paste <b>Key</b> → <b>Connect</b></p>
   <div class="two-col">
   <div>
-  <p class="small">Verifikasi service (namanya <b>WazuhSvc</b>):</p>
-  <pre class="code"><code>Get-Service *wazuh*   # Status: Running</code></pre>
+  <p class="small">Verifikasi service (<b>WazuhSvc</b>):</p>
+  <pre class="code" style="font-size:0.55em"><code>Get-Service *wazuh*   # Status: Running</code></pre>
   </div>
   <div style="text-align:center">
     <img class="slide-img" src="data:image/png;base64,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" alt="Wazuh Agent GUI (win32ui)"
@@ -825,23 +825,24 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
   </div>
   <p class="small dim">Agent memantau folder Desktop, Downloads, Documents — secara real-time.</p>
 </section>
-<section>
+<!-- Slide: persiapan aktifkan FIM -->
+<section class="padat">
   <h2>🛠️ Persiapan: Aktifkan FIM</h2>
-  <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Cek username Windows</td><td>Buka <b>PowerShell</b> → ketik <code>echo $env:USERNAME</code> → catat hasilnya</td></tr>
-    <tr><td>2️⃣ Buka file config</td><td>Start → ketik <b>Notepad</b> → klik kanan → <b>Run as Administrator</b> → File → Open → pergi ke <code>C:\Program Files (x86)\ossec-agent\</code> → pilih <b>All Files</b> → buka <code>ossec.conf</code></td></tr>
-    <tr><td>3️⃣ Cari bagian syscheck</td><td>Ctrl+F → ketik <code>&lt;syscheck&gt;</code> → Enter</td></tr>
-    <tr><td>4️⃣ Ganti folder dipantau</td><td>Di antara <code>&lt;syscheck&gt;</code> dan <code>&lt;/syscheck&gt;</code>, tulis (ganti NAMA_KAMU = hasil langkah 1):<br><code>&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Desktop&lt;/directories&gt;</code></td></tr>
-    <tr><td>5️⃣ Simpan</td><td>Ctrl+S (kalau gagal save → file masih bukan Administrator)</td></tr>
+  <table class="qa-table tiny" style="text-align:left">
+    <tr><td>1️⃣ Cek username</td><td>PowerShell → <code>echo $env:USERNAME</code> → catat</td></tr>
+    <tr><td>2️⃣ Buka config</td><td>Notepad <b>Run as Administrator</b> → <code>C:\Program Files (x86)\ossec-agent\ossec.conf</code> (All Files)</td></tr>
+    <tr><td>3️⃣ Cari syscheck</td><td>Ctrl+F → <code>&lt;syscheck&gt;</code> → Enter</td></tr>
+    <tr><td>4️⃣ Tambah folder</td><td>Di antara <code>&lt;syscheck&gt;</code> dan <code>&lt;/syscheck&gt;</code> (NAMA_KAMU = hasil langkah 1):<br><code>&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Desktop&lt;/directories&gt;</code></td></tr>
+    <tr><td>5️⃣ Simpan</td><td>Ctrl+S (gagal save = belum Run as Administrator)</td></tr>
     <tr><td>6️⃣ Restart agent</td><td>PowerShell (Admin): <code>Restart-Service -Name "WazuhSvc"</code></td></tr>
   </table>
-  <p class="small dim">✅ Selesai — FIM aktif memantau Desktop-mu. Lanjut ke langkah 5️⃣ Verifikasi.</p>
+  <p class="small dim">✅ FIM aktif memantau Desktop-mu → lanjut ke Langkah Attack 1.</p>
 </section>
 
 <!-- Slide 57 -->
 <section>
   <h2>🧪 Langkah Attack 1 — FIM</h2>
-  <table class="qa-table small" style="text-align:left">
+  <table class="qa-table tiny" style="text-align:left">
     <tr><td>0️⃣ Prasyarat</td><td>FIM sudah diaktifkan di slide <b>Persiapan</b> sebelumnya. Belum? Kerjakan slide Persiapan dulu.</td></tr>
     <tr><td>1️⃣ Buka Notepad</td><td>Start → ketik "notepad" → Enter</td></tr>
     <tr><td>2️⃣ Tulis apa saja</td><td>Contoh: <code>ini file percobaan FIM</code></td></tr>
@@ -865,16 +866,19 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 </section>
 
 <!-- Slide 58 -->
-<section>
+<!-- Slide: persiapan aktifkan powershell logging -->
+<section class="padat">
   <h2>🛠️ Persiapan: Aktifkan PowerShell Logging</h2>
-  <p class="small">Sekali saja sebelum praktikum — agar setiap command PowerShell tercatat di Event Viewer <b>(Event 4104)</b>. <span class="dim">("Script Block Logging" = fitur bawaan Windows yang merekam perintah PowerShell)</span></p>
+  <p class="small">Sekali saja — agar command PowerShell tercatat di Event Viewer <b>(Event 4104)</b>. <span class="dim">("Script Block Logging" = fitur bawaan Windows yang merekam perintah PowerShell)</span></p>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Buka PowerShell sebagai Admin</td><td><code>Win + R</code> → ketik <code>powershell</code> → tekan <code>Ctrl+Shift+Enter</code> → klik <b>Yes</b></td></tr>
-    <tr><td>2️⃣ Aktifkan logging</td><td>Paste command ini → Enter:<br><code>New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force</code><br><code>Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name EnableScriptBlockLogging -Value 1</code></td></tr>
-    <tr><td>3️⃣ Verifikasi</td><td><code>Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"</code> → harus muncul <code>EnableScriptBlockLogging : 1</code></td></tr>
-    <tr><td>4️⃣ Selesai ✅</td><td>Lanjut ke Langkah Attack 2 (PowerShell)</td></tr>
+    <tr><td>1️⃣ PowerShell as Admin</td><td><code>Win + R</code> → <code>powershell</code> → <code>Ctrl+Shift+Enter</code> → Yes</td></tr>
+    <tr><td>2️⃣ Aktifkan</td><td>Paste 2 command (di bawah) → Enter</td></tr>
+    <tr><td>3️⃣ Verifikasi</td><td>Command 3 (di bawah) → muncul <code>EnableScriptBlockLogging : 1</code></td></tr>
   </table>
-  <p class="small dim">📌 Path registry ini memang <b>belum ada bawaan</b> — command 1 yang membuatnya (normal kalau "tidak ketemu" sebelum dijalankan). Error merah "Access denied" = PowerShell belum Admin. ✅ Cara ini jalan di semua Windows (Home/Pro/Enterprise).</p>
+  <pre class="code" style="font-size:0.56em"><code>1: New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force
+2: Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name EnableScriptBlockLogging -Value 1
+3: Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"</code></pre>
+  <p class="small dim">📌 Path itu memang <b>belum ada bawaan</b> — command 1 yang membuatnya (normal "tidak ketemu" sebelum dijalankan). Error "Access denied" = belum Admin. ✅ Jalan di semua Windows (Home/Pro/Enterprise). Hasil lengkap → slide berikutnya.</p>
 </section>
 <!-- Slide: tampilan powershell yang benar -->
 <section>
@@ -907,46 +911,63 @@ PSDrive  : HKLM</code></pre>
 
 
 <!-- Slide: alternatif GUI gpedit -->
-<section>
+<!-- Slide: alternatif GUI gpedit -->
+<section class="padat">
   <h2>🪟 Alternatif GUI: gpedit.msc (Windows Pro)</h2>
-  <p class="small dim">Hasil sama dengan metode PowerShell di slide sebelumnya — pilih salah satu. Windows Home: gunakan metode PowerShell.</p>
+  <p class="small dim">Hasil sama dengan metode PowerShell — pilih salah satu. Windows Home: pakai metode PowerShell.</p>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Buka Group Policy Editor</td><td><code>Win + R</code> → ketik <code>gpedit.msc</code> → Enter</td></tr>
-    <tr><td>2️⃣ Navigasi ke menu</td><td>Computer Configuration → Administrative Templates → Windows Components → <b>Windows PowerShell</b></td></tr>
-    <tr><td>3️⃣ Aktifkan logging</td><td>Klik 2x <b>"Turn on PowerShell Script Block Logging"</b> → pilih <b>Enabled</b> → OK</td></tr>
-    <tr><td>4️⃣ Update policy</td><td><code>Win + R</code> → ketik <code>cmd</code> → Enter → ketik <code>gpupdate /force</code> → Enter</td></tr>
-    <tr><td>5️⃣ Selesai ✅</td><td>Lanjut ke Langkah Attack 2 (PowerShell)</td></tr>
+    <tr><td>1️⃣ Buka</td><td><code>Win + R</code> → <code>gpedit.msc</code> → Enter</td></tr>
+    <tr><td>2️⃣ Navigasi</td><td>Computer Configuration → Administrative Templates → Windows Components → <b>Windows PowerShell</b></td></tr>
+    <tr><td>3️⃣ Aktifkan</td><td>Klik 2x <b>"Turn on PowerShell Script Block Logging"</b> → <b>Enabled</b> → OK</td></tr>
+    <tr><td>4️⃣ Update policy</td><td><code>Win + R</code> → <code>cmd</code> → <code>gpupdate /force</code></td></tr>
   </table>
-  <p class="small dim">📌 gpedit.msc hanya ada di Windows Pro/Enterprise/Education — Windows Home: pakai metode PowerShell di slide sebelumnya.</p>
+  <p class="small dim">📌 gpedit hanya ada di Pro/Enterprise/Education — Home: pakai metode PowerShell.</p>
 </section>
 <!-- Slide: izinkan wazuh baca log powershell -->
-<section>
+<!-- Slide: izinkan wazuh baca log powershell -->
+<section class="padat">
   <h2>🔌 Izinkan Wazuh Membaca Log PowerShell</h2>
-  <p class="small">Wajib — tanpa ini Event 4104 ada di Event Viewer tapi <b>tidak pernah sampai ke Wazuh</b>. <span class="dim">(Agent bawaan hanya membaca log Application, Security, System)</span></p>
+  <p class="small">Wajib — tanpa ini Event 4104 ada di Event Viewer tapi <b>tidak pernah sampai ke Wazuh</b>. <span class="dim">(Agent bawaan hanya membaca Application, Security, System)</span></p>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Buka ossec.conf</td><td>Notepad <b>Run as Administrator</b> → File → Open → <code>C:\Program Files (x86)\ossec-agent\</code> → pilih <b>All Files</b> → buka <code>ossec.conf</code></td></tr>
-    <tr><td>2️⃣ Cari blok localfile</td><td>Ctrl+F → ketik <code>&lt;localfile&gt;</code> → Enter (lihat contoh bloknya)</td></tr>
-    <tr><td>3️⃣ Tambah blok baru</td><td>Di bawah blok <code>&lt;localfile&gt;</code> terakhir (sebelum <code>&lt;/ossec_config&gt;</code>), tambah:<br><code>&lt;localfile&gt;</code><br><code>&nbsp;&nbsp;&lt;location&gt;Microsoft-Windows-PowerShell/Operational&lt;/location&gt;</code><br><code>&nbsp;&nbsp;&lt;log_format&gt;eventchannel&lt;/log_format&gt;</code><br><code>&lt;/localfile&gt;</code></td></tr>
-    <tr><td>4️⃣ Simpan + restart</td><td>Ctrl+S → PowerShell (Admin): <code>Restart-Service -Name "WazuhSvc"</code></td></tr>
-    <tr><td>5️⃣ Verifikasi</td><td>Buka PowerShell <b>baru</b> → ketik command apa saja → tunggu ±1 menit → Wazuh dashboard → Discover → filter <code>rule.groups:powershell</code></td></tr>
+    <tr><td>1️⃣ Buka ossec.conf</td><td>Notepad <b>Run as Administrator</b> → buka <code>C:\Program Files (x86)\ossec-agent\ossec.conf</code> (pilih <b>All Files</b>)</td></tr>
+    <tr><td>2️⃣ Tambah blok</td><td>Di bawah blok <code>&lt;localfile&gt;</code> terakhir (sebelum <code>&lt;/ossec_config&gt;</code>) — lihat blok di bawah ⬇</td></tr>
+    <tr><td>3️⃣ Simpan + restart</td><td>Ctrl+S → PowerShell (Admin): <code>Restart-Service -Name "WazuhSvc"</code></td></tr>
+    <tr><td>4️⃣ Verifikasi</td><td>PowerShell <b>baru</b> → ketik command → ±1 menit → Discover → <code>rule.groups:powershell</code></td></tr>
   </table>
-  <p class="small dim">📌 Kuncinya: Event Viewer mencatat ≠ Wazuh mengambil. Agent harus <b>diperintah</b> membaca channel log-nya. Sama seperti FIM: config dulu → restart → baru terdeteksi.</p>
+  <pre class="code" style="font-size:0.58em; line-height:1.15; padding:0.4em 0.6em"><code>&lt;localfile&gt;
+  &lt;location&gt;Microsoft-Windows-PowerShell/Operational&lt;/location&gt;
+  &lt;log_format&gt;eventchannel&lt;/log_format&gt;
+&lt;/localfile&gt;</code></pre>
+  <p class="small dim" style="margin-bottom:0">📌 Event Viewer mencatat ≠ Wazuh mengambil — agent harus <b>diperintah</b> membaca channel-nya.</p>
 </section>
 <!-- Slide: custom rule powershell manager -->
 <!-- Slide: custom rule powershell manager -->
 <!-- Slide: custom rule powershell manager -->
+<!-- Slide: konsep event vs alert + rule -->
 <section>
-  <h2>📏 Buat Rule di Manager: Event → Alert</h2>
-  <p class="small">Secara bawaan, Wazuh hanya memberi <b>alert</b> untuk command berbahaya yang dikenali. Command biasa seperti <code>whoami</code> hanya jadi <b>event</b> (level 0) — tidak muncul di dashboard. Kita buat 1 rule sendiri: <b>semua command PowerShell = alert</b>.</p>
+  <h2>📏 Buat Rule: Event → Alert</h2>
+  <p class="small">Bawaan Wazuh: command biasa seperti <code>whoami</code> hanya jadi <b>event</b> (level 0) — tak muncul di dashboard. Kita buat 1 rule: <b>semua command PowerShell = alert</b>.</p>
+  <p class="small" style="margin:0.4em 0">Tempel di akhir <span class="mono">local_rules.xml</span> (manager/WSL):</p>
+  <pre class="code" style="font-size:0.66em"><code>&lt;group name="powershell,"&gt;
+  &lt;rule id="100620" level="3"&gt;
+    &lt;if_sid&gt;91801&lt;/if_sid&gt;
+    &lt;description&gt;PowerShell command executed (Script Block Logging)&lt;/description&gt;
+    &lt;mitre&gt;&lt;id&gt;T1059.001&lt;/id&gt;&lt;/mitre&gt;
+  &lt;/rule&gt;
+&lt;/group&gt;</code></pre>
+  <p class="small dim">📌 Konsep: <b>event ≠ alert</b> — CCTV merekam semua (event), satpam yang menentukan mana diumumkan (alert). ID custom bebas 100000–120000. 💡 Setelah rule aktif, <b>tidak perlu logall</b> — alert langsung masuk dashboard.</p>
+</section>
+
+<!-- Slide: cara pasang rule -->
+<section class="padat">
+  <h2>📌 Pasang Rule di Manager</h2>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Buka editor rule (2 cara)</td><td><b>Cara GUI:</b> login dashboard sebagai <b>admin</b> → menu ☰ → <b>Server management</b> → <b>Rules</b> → buka editor custom rules (XML)<br><b>Cara file:</b> Explorer → <code>\\wsl.localhost\Ubuntu\var\ossec\etc\rules\</code> → buka <code>local_rules.xml</code> dgn Notepad</td></tr>
-    <tr><td>2️⃣ Tambah rule</td><td>Tempel di akhir file/editor → Save (GUI) atau Ctrl+S (file):<br><code>&lt;group name="powershell,"&gt;</code><br><code>&nbsp;&nbsp;&lt;rule id="100620" level="3"&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;if_sid&gt;91801&lt;/if_sid&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;description&gt;PowerShell command executed (Script Block Logging)&lt;/description&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;mitre&gt;&lt;id&gt;T1059.001&lt;/id&gt;&lt;/mitre&gt;</code><br><code>&nbsp;&nbsp;&lt;/rule&gt;</code><br><code>&lt;/group&gt;</code></td></tr>
-    <tr><td>3️⃣ Restart manager</td><td>GUI: dashboard biasa menawarkan tombol restart setelah Save · Terminal WSL: <code>sudo /var/ossec/bin/wazuh-control restart</code></td></tr>
-    <tr><td>4️⃣ Verifikasi rule</td><td>Dashboard → <b>Server management → Rules</b> → search <code>100620</code> → muncul &amp; aktif ✅</td></tr>
-    <tr><td>5️⃣ (Bonus) Ruleset Test</td><td>Halaman yang sama → <b>Ruleset Test</b> → paste event format <b>JSON Wazuh</b> — mulai dari <code>{"win":...</code> (ambil dari <code>archives.log</code>, tanpa prefix waktu). <b>Bukan XML dari Event Viewer</b> — agent mengirim versi JSON, bukan XML → lihat rule yang match langsung di browser</td></tr>
-    <tr><td>6️⃣ Uji lengkap</td><td>PowerShell <b>baru</b> → ketik <code>whoami</code> → tunggu ±1 menit → dashboard → Discover → <code>rule.groups:powershell</code> → muncul alert "PowerShell command executed" ✅</td></tr>
+    <tr><td>1️⃣ Buka editor</td><td><b>GUI:</b> dashboard login <b>admin</b> → Server management → Rules → editor XML<br><b>File:</b> Explorer → <code>\\wsl.localhost\Ubuntu\var\ossec\etc\rules\</code> → Notepad</td></tr>
+    <tr><td>2️⃣ Tempel + simpan</td><td>Paste rule dari slide sebelumnya di akhir file → Save (GUI) / Ctrl+S (Notepad)</td></tr>
+    <tr><td>3️⃣ Restart</td><td>Terminal WSL: <code>sudo /var/ossec/bin/wazuh-control restart</code> (dashboard GUI biasanya menawarkan tombol restart)</td></tr>
+    <tr><td>4️⃣ Verifikasi rule</td><td>Dashboard → Server management → Rules → cari <code>100620</code> → aktif ✅</td></tr>
+    <tr><td>5️⃣ Bonus: Ruleset Test</td><td>Paste event <b>JSON Wazuh</b> (<code>{"win":...</code>, tanpa prefix waktu — bukan XML Event Viewer) → lihat rule match di browser</td></tr>
   </table>
-  <p class="small dim">💡 Setelah rule aktif, <b>tidak perlu logall</b> — alert langsung masuk dashboard. 📌 Konsep: <b>event ≠ alert</b> — CCTV merekam semua, satpam yang menentukan mana diumumkan. Rule ini menangkap SEMUA event dari channel PowerShell (4104 &amp; kawan-kawan). Kalau mau hanya 4104, tambah baris: <code>&lt;field name="win.eventdata.scriptBlockText" type="pcre2"&gt;.+&lt;/field&gt;</code>. ID custom bebas 100000–120000.</p>
 </section>
 
 
@@ -967,37 +988,28 @@ PSDrive  : HKLM</code></pre>
   <p class="small dim">Pelajaran: attacker mengetik sesuatu — dan SEMUANYA meninggalkan jejak.</p>
 </section>
 
+<!-- Slide: langkah attack 2 -->
 <section>
   <h2>🧪 Langkah Attack 2 — PowerShell</h2>
-  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63–67.</p>
+  <p class="small"><b>Prasyarat:</b> PowerShell Logging aktif ✅ (slide 63–68 — kalau belum, kembali ke sana).</p>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Buka PowerShell</td><td>Start → ketik "powershell" → klik <b>Windows PowerShell</b></td></tr>
-    <tr><td>2️⃣ Jalankan 3 command</td><td>Ketik satu per satu, tekan Enter setelahnya:<br>
-      <code>ping google.com</code> <span class="dim">(cek koneksi ke internet)</span><br>
-      <code>whoami</code> <span class="dim">(tampilkan nama user kita)</span><br>
-      <code>dir</code> <span class="dim">(daftar file di folder sekarang)</span></td></tr>
-    <tr><td>3️⃣ Lihat jejaknya</td><td>Start → ketik "event viewer" → buka<br>
-      <b>Applications and Services Logs → Windows PowerShell → Operational</b></td></tr>
-    <tr><td>4️⃣ Cari Event ID 4104</td><td>Klik log terbaru (paling atas) — isinya = command yang tadi diketik</td></tr>
-    <tr><td>5️⃣ Cek di Wazuh</td><td>Dashboard → Discover → filter agent kamu → alert muncul!</td></tr>
+    <tr><td>1️⃣ Buka PowerShell</td><td>Start → ketik "powershell" → Enter</td></tr>
+    <tr><td>2️⃣ Jalankan 3 command</td><td><code>ping google.com</code> · <code>whoami</code> · <code>dir</code></td></tr>
+    <tr><td>3️⃣ Lihat jejak lokal</td><td>Event Viewer → <b>Windows PowerShell → Operational</b> → cari <b>Event ID 4104</b> — isinya = command tadi</td></tr>
+    <tr><td>4️⃣ Cek di Wazuh</td><td>Dashboard → Discover → filter agent kamu → <b>alert muncul!</b> (bentuknya → slide berikutnya)</td></tr>
   </table>
 </section>
 <!-- Slide: tampilan alert di dashboard -->
-<section>
+<section class="padat">
   <h2>✅ Tampilan yang Benar di Dashboard</h2>
   <p class="small">Di Discover (filter <code>rule.groups:powershell</code>), klik alert terbaru — cocokkan dengan ini:</p>
-  <pre class="code" style="font-size:0.62em"><code>"rule": {
-  "level": <b>3</b>,
+  <pre class="code" style="font-size:0.56em"><code>"rule": { "level": <b>3</b>, "id": "<b>100620</b>", "groups": ["powershell"],
   "description": "<b>PowerShell command executed (Script Block Logging)</b>",
-  "id": "<b>100620</b>",
-  "groups": ["powershell"],
-  "mitre": { "id": ["T1059.001"], "tactic": ["Execution"] }
-},
+  "mitre": { "id": ["T1059.001"], "tactic": ["Execution"] } },
 "scriptBlockText": "{ whoami; cd c:\ }"   ← command yang kamu ketik!</code></pre>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>agent.name</td><td>nama Windows-mu (mis. <span class="mono">windows</span>)</td></tr>
-    <tr><td>data.win.system.eventID</td><td><b>4104</b> — bukti Script Block Logging jalan</td></tr>
-    <tr><td>rule.id</td><td><b>100620</b> — bukti custom rule kamu bekerja</td></tr>
+    <tr><td>eventID <b>4104</b></td><td>bukti Script Block Logging jalan</td></tr>
+    <tr><td>rule.id <b>100620</b></td><td>bukti custom rule kamu bekerja · <span class="mono">agent.name</span> = laptop siapa</td></tr>
   </table>
   <p class="small dim">🔎 Kalau alert tidak muncul: cek timeframe <b>Last 1 hour</b> → index <span class="mono">wazuh-alerts-*</span> → hapus filter ekstra dulu, baru filter powershell. Command = jejak; alert = pengumuman.</p>
 </section>
@@ -1019,7 +1031,7 @@ PSDrive  : HKLM</code></pre>
 <!-- Slide 61 -->
 <section>
   <h2>🧪 Langkah Uji Coba — Bertahap</h2>
-  <table class="qa-table small" style="text-align:left">
+  <table class="qa-table tiny" style="text-align:left">
     <tr><td>1️⃣ Persiapan</td><td>Pastikan Wazuh agent aktif & SSH service berjalan di target. Buka terminal di mesin penyerang.</td></tr>
     <tr><td>2️⃣ Serangan sederhana</td><td>Coba login SSH salah password 3–5× manual:<br><code>ssh admin@&lt;ip-target&gt;</code> (ketik password salah berulang)</td></tr>
     <tr><td>3️⃣ Lihat di log server</td><td><code>sudo grep "Failed password" /var/log/secure</code></td></tr>
@@ -1030,10 +1042,10 @@ PSDrive  : HKLM</code></pre>
 </section>
 
 <!-- Slide 62 -->
-<section>
+<section class="padat">
   <h2>🎭 Level Lanjut: Ganti-Ganti IP (Distributed)</h2>
   <p class="small">Penyerang sungguhan tidak pakai 1 IP — kita simulasikan dengan Tor:</p>
-  <table class="qa-table small" style="text-align:left">
+  <table class="qa-table tiny" style="text-align:left">
     <tr><td>1️⃣ Jalankan script lab (v3.5.0)</td><td><code>./simulate_bruteforce.sh --host &lt;ip&gt; --count 5 --mode tor</code><br><span class="small dim">Script di paket workshop (folder <span class="mono">scripts/</span>) — dari facilitator · 5 IP berbeda via Tor · ringkasan terverifikasi log server</span></td></tr>
     <tr><td>2️⃣ Gerbang etika</td><td>Ketik <code>SAYA PUNYA IZIN</code> (pengingat: server milik sendiri!)</td></tr>
     <tr><td>3️⃣ Amati output</td><td>Setiap iterasi = IP berbeda, login gagal, ringkasan terverifikasi log</td></tr>
