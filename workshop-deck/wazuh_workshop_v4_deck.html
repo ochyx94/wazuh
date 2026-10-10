@@ -593,6 +593,22 @@
 &lt;/syscheck&gt;</code></pre>
   <p class="small dim">Ganti <span class="mono">NAMA_KAMU</span> dgn username Windows-mu. <span class="mono">realtime="yes"</span> = deteksi saat itu juga. Ini isi <span class="mono">fim-config.xml</span> di paket workshop.</p>
 </section>
+<!-- Slide baru: cara kerja deteksi FIM -->
+<section>
+  <h2>🔍 Cara FIM Mendeteksi</h2>
+  <div class="vflow">
+    <div class="vbox"><span class="icon">📸</span><span class="lbl">1. Baseline</span><div class="sub">scan pertama: catat "kamus" semua file — ukuran, waktu, hash (MD5/SHA1/SHA256)</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">👁️</span><span class="lbl">2. Pantau realtime</span><div class="sub">Windows API tahu langsung saat file dibuat/diubah/dihapus</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">⚖️</span><span class="lbl">3. Bandingkan</span><div class="sub">attribute file sekarang vs kamus — beda? itu kejadian</div></div>
+    <span class="varrow">→</span>
+    <div class="vbox"><span class="icon">🚨</span><span class="lbl">4. Alert ke Manager</span><div class="sub">rule 554 file added · 550 file modified · 553 file deleted</div></div>
+  </div>
+  <p class="small dim">💬 Cek di agent setelah config: <span class="mono">C:\Program Files (x86)\ossec-agent\queue\diff\</span> berisi baseline FIM → syscheck aktif.</p>
+</section>
+
+
 
 <!-- Slide 40 -->
 <section>
