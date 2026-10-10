@@ -39,6 +39,37 @@ Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlo
 
 5. Selesai ✅ — tidak perlu restart apa pun.
 
+---
+
+### WAJIB: Izinkan Wazuh Membaca Log PowerShell
+
+Tanpa langkah ini, Event 4104 ada di Event Viewer tapi **tidak pernah sampai ke Wazuh**
+(agent bawaan hanya membaca log Application, Security, System).
+
+1. Buka `C:\Program Files (x86)\ossec-agent\ossec.conf` dengan Notepad **Run as Administrator**
+   (File → Open → pilih **All Files** dulu supaya terlihat)
+2. Cari blok `<localfile>` terakhir (Ctrl+F → ketik `<localfile>`)
+3. Tambahkan blok ini di bawahnya, sebelum `</ossec_config>`:
+
+```xml
+<localfile>
+  <location>Microsoft-Windows-PowerShell/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
+```
+
+4. Simpan (Ctrl+S), lalu restart agent di PowerShell (Admin):
+
+```powershell
+Restart-Service -Name "WazuhSvc"
+```
+
+5. Verifikasi: buka PowerShell **baru** → ketik command apa saja → tunggu ±1 menit →
+   Wazuh dashboard → Discover → filter `rule.groups:powershell`
+
+> 📌 Kuncinya: Event Viewer mencatat ≠ Wazuh mengambil. Agent harus diperintah
+> membaca channel log PowerShell.
+
 > 📌 Path registry ini memang belum ada bawaan Windows — command pertama yang membuatnya. Jadi kalau dicari di Registry Editor sebelum command dijalankan, wajar "tidak ketemu".
 
 > 💻 Cara ini jalan di semua Windows (Home/Pro/Enterprise).

@@ -895,6 +895,21 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
   </table>
   <p class="small dim">📌 gpedit.msc hanya ada di Windows Pro/Enterprise/Education — Windows Home: pakai metode PowerShell di slide sebelumnya.</p>
 </section>
+<!-- Slide: izinkan wazuh baca log powershell -->
+<section>
+  <h2>🔌 Izinkan Wazuh Membaca Log PowerShell</h2>
+  <p class="small">Wajib — tanpa ini Event 4104 ada di Event Viewer tapi <b>tidak pernah sampai ke Wazuh</b>. <span class="dim">(Agent bawaan hanya membaca log Application, Security, System)</span></p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Buka ossec.conf</td><td>Notepad <b>Run as Administrator</b> → File → Open → <code>C:\Program Files (x86)\ossec-agent\</code> → pilih <b>All Files</b> → buka <code>ossec.conf</code></td></tr>
+    <tr><td>2️⃣ Cari blok localfile</td><td>Ctrl+F → ketik <code>&lt;localfile&gt;</code> → Enter (lihat contoh bloknya)</td></tr>
+    <tr><td>3️⃣ Tambah blok baru</td><td>Di bawah blok <code>&lt;localfile&gt;</code> terakhir (sebelum <code>&lt;/ossec_config&gt;</code>), tambah:<br><code>&lt;localfile&gt;</code><br><code>&nbsp;&nbsp;&lt;location&gt;Microsoft-Windows-PowerShell/Operational&lt;/location&gt;</code><br><code>&nbsp;&nbsp;&lt;log_format&gt;eventchannel&lt;/log_format&gt;</code><br><code>&lt;/localfile&gt;</code></td></tr>
+    <tr><td>4️⃣ Simpan + restart</td><td>Ctrl+S → PowerShell (Admin): <code>Restart-Service -Name "WazuhSvc"</code></td></tr>
+    <tr><td>5️⃣ Verifikasi</td><td>Buka PowerShell <b>baru</b> → ketik command apa saja → tunggu ±1 menit → Wazuh dashboard → Discover → filter <code>rule.groups:powershell</code></td></tr>
+  </table>
+  <p class="small dim">📌 Kuncinya: Event Viewer mencatat ≠ Wazuh mengambil. Agent harus <b>diperintah</b> membaca channel log-nya. Sama seperti FIM: config dulu → restart → baru terdeteksi.</p>
+</section>
+
+
 
 
 
@@ -912,7 +927,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 
 <section>
   <h2>🧪 Langkah Attack 2 — PowerShell</h2>
-  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63.</p>
+  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63–65.</p>
   <table class="qa-table small" style="text-align:left">
     <tr><td>1️⃣ Buka PowerShell</td><td>Start → ketik "powershell" → klik <b>Windows PowerShell</b></td></tr>
     <tr><td>2️⃣ Jalankan 3 command</td><td>Ketik satu per satu, tekan Enter setelahnya:<br>
