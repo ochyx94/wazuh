@@ -106,7 +106,7 @@
         <li>Apa itu SIEM?</li>
         <li>Wazuh sebagai SIEM</li>
         <li>Beberapa fitur Wazuh + alur kerjanya</li>
-        <li>Praktikum: install agent + dashboard</li>
+        <li>Praktikum: install agent + FIM config + dashboard</li>
       </ul>
     </div>
     <div>
@@ -686,10 +686,28 @@ sudo ./manage_agents
     <p class="small dim">Isi Manager IP + Key → Status berubah dari "not imported" ✅</p>
   </div>
 </section>
+<!-- Slide baru: konfigurasi FIM di Praktikum 1 -->
+<section>
+  <h2>4️⃣ Aktifkan FIM (Persiapan Attack 1)</h2>
+  <ol class="tight">
+    <li>Buka file config: <span class="mono">C:\Program Files (x86)\ossec-agent\ossec.conf</span> (pakai Notepad <b>Run as Administrator</b>)</li>
+    <li>Cari bagian <span class="mono">&lt;syscheck&gt;</span> → ganti folder yang dipantau:</li>
+  </ol>
+  <pre class="code"><code>&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Downloads&lt;/directories&gt;
+&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Desktop&lt;/directories&gt;
+&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Documents&lt;/directories&gt;</code></pre>
+  <ol class="tight" start="3">
+    <li>Ganti <span class="mono">NAMA_KAMU</span> dengan username Windows-mu (<span class="mono">echo %USERNAME%</span>)</li>
+    <li>Simpan → restart agent: <span class="mono">Restart-Service -Name "Wazuh"</span></li>
+  </ol>
+  <p class="small dim">📄 Config lengkap + penjelasan: <span class="mono">fim-config.xml</span> di paket workshop. Ini 1x saja — Attack 1 nanti tinggal uji coba.</p>
+</section>
+
+
 
 <!-- Slide 46 -->
 <section>
-  <h2>4️⃣ Verifikasi + Manajemen Service</h2>
+  <h2>5️⃣ Verifikasi + Manajemen Service</h2>
   <p>Dashboard → <b>Agents</b> → Status: <span class="ok"><b>Active</b> (green) ✅</span></p>
   <table class="qa-table small">
     <tr><td>Tidak konek / habis edit config</td><td><b>Restart</b></td></tr>
@@ -819,7 +837,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 <section>
   <h2>🧪 Langkah Attack 1 — FIM</h2>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>0️⃣ Persiapan (sekali saja)</td><td>Apply <code>fim-config.xml</code> ke <code>ossec.conf</code> agent (ganti NAMA_KAMU) → restart agent</td></tr>
+    <tr><td>0️⃣ Cek persiapan</td><td>FIM sudah aktif dari Praktikum 1 langkah 4️⃣ — kalau belum, lihat <code>fim-config.xml</code></td></tr>
     <tr><td>1️⃣ Buka Notepad</td><td>Start → ketik "notepad" → Enter</td></tr>
     <tr><td>2️⃣ Tulis apa saja</td><td>Contoh: <code>ini file percobaan FIM</code></td></tr>
     <tr><td>3️⃣ Simpan ke Desktop</td><td>File → Save As → pilih <b>Desktop</b> → nama: <code>lab-fim-test.txt</code> → Save</td></tr>
