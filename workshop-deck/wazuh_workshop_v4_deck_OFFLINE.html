@@ -882,6 +882,36 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
   </table>
   <p class="small dim">📌 Path registry ini memang <b>belum ada bawaan</b> — command 1 yang membuatnya (normal kalau "tidak ketemu" sebelum dijalankan). Error merah "Access denied" = PowerShell belum Admin. ✅ Cara ini jalan di semua Windows (Home/Pro/Enterprise).</p>
 </section>
+<!-- Slide: tampilan powershell yang benar -->
+<section>
+  <h2>💻 Tampilan yang Benar di PowerShell (Windows Home)</h2>
+  <p class="small">Hasil tiap command di slide sebelumnya — cocokkan dengan layarmu:</p>
+  <div class="two-col" style="gap:0.8em">
+    <div>
+      <p class="small" style="margin:0.2em 0"><b>1️⃣ New-Item</b> → key terbuat:</p>
+      <pre class="code" style="font-size:0.62em"><code>    Hive: HKEY_LOCAL_MACHINE\SOFTWARE\Policies\
+    Microsoft\Windows\PowerShell
+
+Name                Property
+----                --------
+ScriptBlockLogging</code></pre>
+      <p class="small" style="margin:0.2em 0"><b>2️⃣ Set-ItemProperty</b> → tidak ada output, kembali ke prompt = sukses ✅</p>
+    </div>
+    <div>
+      <p class="small" style="margin:0.2em 0"><b>3️⃣ Get-ItemProperty</b> → nilai ON:</p>
+      <pre class="code" style="font-size:0.62em"><code>EnableScriptBlockLogging : 1
+PSPath   : Microsoft.PowerShell.Core\
+           Registry::HKEY_LOCAL_MACHINE\
+           SOFTWARE\Policies\Microsoft\
+           Windows\PowerShell\ScriptBlockLogging
+PSChildName : ScriptBlockLogging
+PSDrive  : HKLM</code></pre>
+      <p class="small dim" style="margin:0.2em 0">Yang penting baris pertama: <b>: 1</b></p>
+    </div>
+  </div>
+</section>
+
+
 <!-- Slide: alternatif GUI gpedit -->
 <section>
   <h2>🪟 Alternatif GUI: gpedit.msc (Windows Pro)</h2>
@@ -941,7 +971,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 
 <section>
   <h2>🧪 Langkah Attack 2 — PowerShell</h2>
-  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63–66.</p>
+  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63–67.</p>
   <table class="qa-table small" style="text-align:left">
     <tr><td>1️⃣ Buka PowerShell</td><td>Start → ketik "powershell" → klik <b>Windows PowerShell</b></td></tr>
     <tr><td>2️⃣ Jalankan 3 command</td><td>Ketik satu per satu, tekan Enter setelahnya:<br>
