@@ -948,7 +948,7 @@ PSDrive  : HKLM</code></pre>
     <tr><td>3️⃣ Restart manager</td><td><code>sudo /var/ossec/bin/wazuh-control restart</code></td></tr>
     <tr><td>4️⃣ Uji lengkap</td><td>PowerShell <b>baru</b> → ketik <code>whoami</code> → tunggu ±1 menit → dashboard → Discover → <code>rule.groups:powershell</code> → muncul alert "PowerShell command executed" ✅</td></tr>
   </table>
-  <p class="small dim">📌 Konsep penting: <b>event ≠ alert</b>. Event = catatan mentah; alert = catatan yang dinilai penting oleh rule. Sniffer menangkap semua (event), tapi satpam yang menentukan mana yang diumumkan (alert). ID rule custom bebas 100000–120000, jangan pakai yang sudah ada.</p>
+  <p class="small dim">💡 Setelah rule ini aktif, <b>tidak perlu logall</b> — alert langsung masuk dashboard &amp; alerts.json. 📌 Konsep penting: <b>event ≠ alert</b>. Event = catatan mentah; alert = catatan yang dinilai penting oleh rule. Sniffer menangkap semua (event), tapi satpam yang menentukan mana yang diumumkan (alert). ID rule custom bebas 100000–120000, jangan pakai yang sudah ada.</p>
 </section>
 
 
