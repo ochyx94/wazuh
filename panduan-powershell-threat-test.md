@@ -77,8 +77,11 @@ Restart-Service -Name "WazuhSvc"
 Secara bawaan Wazuh hanya memberi **alert** untuk command berbahaya yang dikenali.
 Command biasa seperti `whoami` hanya jadi event (level 0) — tidak muncul di dashboard.
 
-1. Di WSL (manager): `sudo nano /var/ossec/etc/rules/local_rules.xml`
-2. Tambahkan di akhir file:
+1. Cek nama distro WSL (di PowerShell): `wsl -l -v` → catat kolom NAME (mis. `Ubuntu`)
+2. Buka file rule via Windows Explorer — di address bar ketik:
+   `\\wsl.localhost\Ubuntu\var\ossec\etc\rules\` → klik kanan `local_rules.xml`
+   → **Open with Notepad**
+3. Tambahkan di akhir file:
 
 ```xml
 <group name="powershell,">
@@ -90,8 +93,9 @@ Command biasa seperti `whoami` hanya jadi event (level 0) — tidak muncul di da
 </group>
 ```
 
-3. `sudo /var/ossec/bin/wazuh-control restart`
-4. Uji: PowerShell **baru** → `whoami` → tunggu ±1 menit → dashboard → Discover →
+4. Restart manager — buka terminal WSL (Start → ketik `Ubuntu` → Enter):
+   `sudo /var/ossec/bin/wazuh-control restart`
+5. Uji: PowerShell **baru** → `whoami` → tunggu ±1 menit → dashboard → Discover →
    `rule.groups:powershell` → alert "PowerShell command executed" muncul ✅
 
 > 📌 Konsep: event ≠ alert. Event = catatan mentah; alert = catatan yang dinilai
