@@ -871,9 +871,10 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
   <table class="qa-table small" style="text-align:left">
     <tr><td>1️⃣ Buka PowerShell sebagai Admin</td><td><code>Win + R</code> → ketik <code>powershell</code> → tekan <code>Ctrl+Shift+Enter</code> → klik <b>Yes</b></td></tr>
     <tr><td>2️⃣ Aktifkan logging</td><td>Paste command ini → Enter:<br><code>New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force</code><br><code>Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name EnableScriptBlockLogging -Value 1</code></td></tr>
-    <tr><td>3️⃣ Selesai ✅</td><td>Lanjut ke Langkah Attack 2 (PowerShell)</td></tr>
+    <tr><td>3️⃣ Verifikasi</td><td><code>Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"</code> → harus muncul <code>EnableScriptBlockLogging : 1</code></td></tr>
+    <tr><td>4️⃣ Selesai ✅</td><td>Lanjut ke Langkah Attack 2 (PowerShell)</td></tr>
   </table>
-  <p class="small dim">✅ Cara ini jalan di semua Windows (Home/Pro/Enterprise).</p>
+  <p class="small dim">📌 Path registry ini memang <b>belum ada bawaan</b> — command 1 yang membuatnya (normal kalau "tidak ketemu" sebelum dijalankan). Error merah "Access denied" = PowerShell belum Admin. ✅ Cara ini jalan di semua Windows (Home/Pro/Enterprise).</p>
 </section>
 <!-- Slide: alternatif GUI gpedit -->
 <section>

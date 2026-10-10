@@ -29,7 +29,17 @@ New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlock
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name EnableScriptBlockLogging -Value 1
 ```
 
-4. Selesai ✅ — tidak perlu restart apa pun.
+4. Cek berhasil (opsional, di PowerShell yang sama):
+
+```powershell
+Get-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+```
+
+   Harus muncul baris `EnableScriptBlockLogging : 1`. Kalau error "Access denied" berarti PowerShell belum dibuka sebagai Administrator.
+
+5. Selesai ✅ — tidak perlu restart apa pun.
+
+> 📌 Path registry ini memang belum ada bawaan Windows — command pertama yang membuatnya. Jadi kalau dicari di Registry Editor sebelum command dijalankan, wajar "tidak ketemu".
 
 > 💻 Cara ini jalan di semua Windows (Home/Pro/Enterprise).
 > Alternatif Windows Pro (pakai GUI): `Win+R` → `gpedit.msc` → Computer Configuration →
