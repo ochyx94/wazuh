@@ -300,7 +300,7 @@
 </section>
 <section>
   <h2>🧩 6 Fitur Resmi Wazuh</h2>
-  <p class="small dim">Sesuai overview resmi wazuh.com — hari ini kita sentuh 3 di antaranya</p>
+  <p class="small dim">Sesuai overview resmi wazuh.com — <b>fitur = kemampuan yang bisa dilakukan Wazuh</b></p>
   <div class="vgrid">
     <div class="vcard"><span class="icon">⚙️</span><b>Configuration Assessment</b><div class="sub">audit konfigurasi keamanan (SCA)</div></div>
     <div class="vcard vok"><span class="icon">🦠</span><b>Malware Detection</b><div class="sub">indikator kompromi &amp; malware <span class="hl">← praktikum</span></div></div>
@@ -319,7 +319,7 @@
   <h2>🧱 Komponen Wazuh (1): Agent &amp; Manager</h2>
   <div class="vgrid">
     <div class="vcard"><span class="icon">📡</span><b>Agent</b><div class="sub">terinstall di device<br>(Windows / Linux)</div>• kumpulkan log<br>• kirim ke manager</div>
-    <div class="vcard vok"><span class="icon">🏢</span><b>Manager</b><div class="sub">otaknya sistem</div>• terima log<br>• jalankan decoder &amp; rules<br>• putuskan mana yang jadi alert</div>
+    <div class="vcard vok"><span class="icon">🏢</span><b>Manager</b><div class="sub">otaknya sistem — di dalamnya: decoder &amp; rules (komponen wajib)</div>• terima log<br>• jalankan decoder &amp; rules<br>• putuskan mana yang jadi alert</div>
   </div>
 </section>
 
@@ -373,7 +373,7 @@
 
 <!-- Slide 21 -->
 <section>
-  <h2>📦 Pondasi 1: Log Collection <span class="dim">(fondasi, bukan fitur utama)</span></h2>
+  <h2>📦 Komponen Wajib: Log Collection</h2>
   <p class="blue"><b>Wazuh Agent = pengumpul log</b></p>
   <ul class="tight">
     <li>Install di: Windows, Linux, macOS, Docker, Cloud</li>
@@ -417,7 +417,7 @@
 
 <!-- Slide 25 -->
 <section>
-  <h2>📖 Pondasi 2: Log Processing — Decoder</h2>
+  <h2>📖 Komponen Wajib: Decoder</h2>
   <div class="vflow">
     <div class="vbox"><span class="icon">📄</span><span class="lbl">Log Mentah</span><div class="sub">teks acak</div></div>
     <span class="varrow">→</span>
