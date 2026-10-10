@@ -908,6 +908,20 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
   </table>
   <p class="small dim">📌 Kuncinya: Event Viewer mencatat ≠ Wazuh mengambil. Agent harus <b>diperintah</b> membaca channel log-nya. Sama seperti FIM: config dulu → restart → baru terdeteksi.</p>
 </section>
+<!-- Slide: custom rule powershell manager -->
+<section>
+  <h2>📏 Buat Rule di Manager: Event → Alert</h2>
+  <p class="small">Secara bawaan, Wazuh hanya memberi <b>alert</b> untuk command berbahaya yang dikenali (mis. Base64, screen capture). Command biasa seperti <code>whoami</code> hanya jadi <b>event</b> (level 0) — tidak muncul di dashboard. Kita buat 1 rule sendiri: <b>semua command PowerShell = alert</b>.</p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Buka file rule lokal (di WSL)</td><td><code>nano /var/ossec/etc/rules/local_rules.xml</code></td></tr>
+    <tr><td>2️⃣ Tambah rule</td><td>Di paling bawah, sebelum <code>&lt;/group&gt;</code> terakhir (kalau ada), tempel blok di bawah → lalu Ctrl+O, Enter, Ctrl+X<br><code>&lt;group name="powershell,"&gt;</code><br><code>&nbsp;&nbsp;&lt;rule id="100620" level="3"&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;if_sid&gt;91802&lt;/if_sid&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;description&gt;PowerShell command executed (Script Block Logging)&lt;/description&gt;</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&lt;mitre&gt;&lt;id&gt;T1059.001&lt;/id&gt;&lt;/mitre&gt;</code><br><code>&nbsp;&nbsp;&lt;/rule&gt;</code><br><code>&lt;/group&gt;</code></td></tr>
+    <tr><td>3️⃣ Restart manager</td><td><code>sudo /var/ossec/bin/wazuh-control restart</code></td></tr>
+    <tr><td>4️⃣ Uji lengkap</td><td>PowerShell <b>baru</b> → ketik <code>whoami</code> → tunggu ±1 menit → dashboard → Discover → <code>rule.groups:powershell</code> → muncul alert "PowerShell command executed" ✅</td></tr>
+  </table>
+  <p class="small dim">📌 Konsep penting: <b>event ≠ alert</b>. Event = catatan mentah; alert = catatan yang dinilai penting oleh rule. Sniffer menangkap semua (event), tapi satpam yang menentukan mana yang diumumkan (alert). ID rule custom bebas 100000–120000, jangan pakai yang sudah ada.</p>
+</section>
+
+
 
 
 
@@ -927,7 +941,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 
 <section>
   <h2>🧪 Langkah Attack 2 — PowerShell</h2>
-  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63–65.</p>
+  <p class="small"><b>Prasyarat:</b> PowerShell Logging sudah diaktifkan di slide sebelumnya ✅ — kalau belum, kembali ke slide 63–66.</p>
   <table class="qa-table small" style="text-align:left">
     <tr><td>1️⃣ Buka PowerShell</td><td>Start → ketik "powershell" → klik <b>Windows PowerShell</b></td></tr>
     <tr><td>2️⃣ Jalankan 3 command</td><td>Ketik satu per satu, tekan Enter setelahnya:<br>

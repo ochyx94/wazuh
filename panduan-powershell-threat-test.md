@@ -70,6 +70,33 @@ Restart-Service -Name "WazuhSvc"
 > 📌 Kuncinya: Event Viewer mencatat ≠ Wazuh mengambil. Agent harus diperintah
 > membaca channel log PowerShell.
 
+---
+
+### WAJIB: Buat Rule di Manager (agar Event jadi Alert)
+
+Secara bawaan Wazuh hanya memberi **alert** untuk command berbahaya yang dikenali.
+Command biasa seperti `whoami` hanya jadi event (level 0) — tidak muncul di dashboard.
+
+1. Di WSL (manager): `sudo nano /var/ossec/etc/rules/local_rules.xml`
+2. Tambahkan di akhir file:
+
+```xml
+<group name="powershell,">
+  <rule id="100620" level="3">
+    <if_sid>91802</if_sid>
+    <description>PowerShell command executed (Script Block Logging)</description>
+    <mitre><id>T1059.001</id></mitre>
+  </rule>
+</group>
+```
+
+3. `sudo /var/ossec/bin/wazuh-control restart`
+4. Uji: PowerShell **baru** → `whoami` → tunggu ±1 menit → dashboard → Discover →
+   `rule.groups:powershell` → alert "PowerShell command executed" muncul ✅
+
+> 📌 Konsep: event ≠ alert. Event = catatan mentah; alert = catatan yang dinilai
+> penting oleh rule. ID rule custom bebas di rentang 100000–120000.
+
 > 📌 Path registry ini memang belum ada bawaan Windows — command pertama yang membuatnya. Jadi kalau dicari di Registry Editor sebelum command dijalankan, wajar "tidak ketemu".
 
 > 💻 Cara ini jalan di semua Windows (Home/Pro/Enterprise).
