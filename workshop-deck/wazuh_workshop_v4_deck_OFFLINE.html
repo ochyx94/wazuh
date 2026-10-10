@@ -105,7 +105,7 @@
         <li>Apa itu SOC?</li>
         <li>Apa itu SIEM?</li>
         <li>Wazuh sebagai SIEM</li>
-        <li>4 fitur utama Wazuh</li>
+        <li>6 fitur resmi + alur kerja Wazuh</li>
         <li>Praktikum: install agent + dashboard</li>
       </ul>
     </div>
@@ -298,6 +298,21 @@
   </div>
   <p class="small dim">Versi lab kita: 4.14.7</p>
 </section>
+<section>
+  <h2>🧩 6 Fitur Resmi Wazuh</h2>
+  <p class="small dim">Sesuai overview resmi wazuh.com — hari ini kita sentuh 3 di antaranya</p>
+  <div class="vgrid">
+    <div class="vcard"><span class="icon">⚙️</span><b>Configuration Assessment</b><div class="sub">audit konfigurasi keamanan (SCA)</div></div>
+    <div class="vcard vok"><span class="icon">🦠</span><b>Malware Detection</b><div class="sub">indikator kompromi &amp; malware <span class="hl">← praktikum</span></div></div>
+    <div class="vcard vok"><span class="icon">📋</span><b>File Integrity Monitoring</b><div class="sub">alert perubahan file penting <span class="hl">← praktikum Attack 1</span></div></div>
+    <div class="vcard vok"><span class="icon">🔍</span><b>Threat Hunting</b><div class="sub">jelajahi alert keamanan <span class="hl">← Log Analysis Attack 3</span></div></div>
+    <div class="vcard"><span class="icon">💚</span><b>Vulnerability Detection</b><div class="sub">temukan aplikasi yang kena CVE</div></div>
+    <div class="vcard vok"><span class="icon">🧠</span><b>MITRE ATT&amp;CK</b><div class="sub">alert dipetakan ke taktik attacker <span class="hl">← muncul di alert kita</span></div></div>
+  </div>
+  <p class="small dim">vok = akan kita lihat/dipraktikkan hari ini — sisanya cukup dikenali dulu</p>
+</section>
+
+
 
 <!-- Slide 16 -->
 <section>
@@ -358,7 +373,7 @@
 
 <!-- Slide 21 -->
 <section>
-  <h2>📦 Fitur 1: Log Collection</h2>
+  <h2>📦 Pondasi 1: Log Collection <span class="dim">(fondasi, bukan fitur utama)</span></h2>
   <p class="blue"><b>Wazuh Agent = pengumpul log</b></p>
   <ul class="tight">
     <li>Install di: Windows, Linux, macOS, Docker, Cloud</li>
@@ -402,7 +417,7 @@
 
 <!-- Slide 25 -->
 <section>
-  <h2>📖 Fitur 2: Log Processing — Decoder</h2>
+  <h2>📖 Pondasi 2: Log Processing — Decoder</h2>
   <div class="vflow">
     <div class="vbox"><span class="icon">📄</span><span class="lbl">Log Mentah</span><div class="sub">teks acak</div></div>
     <span class="varrow">→</span>
@@ -743,7 +758,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <ul class="tight small">
       <li>SOC = tim jaga 24/7 · SIEM = kumpul+analisis log · <b>Wazuh</b> = SIEM open source</li>
       <li>Alur: <b>Agent → Manager (decoder+rules) → Indexer → Dashboard</b></li>
-      <li>4 fitur: Log Collection, Log Processing, FIM, Vulnerability Detection</li>
+      <li>6 fitur resmi Wazuh + 2 pondasi alur kerja: Log Collection, Log Processing</li>
       <li>Praktikum: agent online + dashboard + query dasar</li>
     </ul>
   </div>
