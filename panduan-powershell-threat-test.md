@@ -86,7 +86,8 @@ Command biasa seperti `whoami` hanya jadi event (level 0) — tidak muncul di da
 ```xml
 <group name="powershell,">
   <rule id="100620" level="3">
-    <if_sid>91802</if_sid>
+    <if_sid>91801</if_sid>
+    <field name="win.eventdata.scriptBlockText" type="pcre2">.+</field>
     <description>PowerShell command executed (Script Block Logging)</description>
     <mitre><id>T1059.001</id></mitre>
   </rule>
