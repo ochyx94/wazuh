@@ -452,6 +452,7 @@
 <!-- Slide 28 -->
 <section>
   <h2>📜 Contoh Decoder XML (ssh)</h2>
+  <p class="small dim">Sumber asli: <span class="mono">0310-ssh_decoders.xml</span> — semua decoder bawaan Wazuh bisa dilihat di <span class="mono">simulator.laptopexp.my.id/wazuh_builtin_decoders.json</span></p>
   <pre class="code"><code>&lt;decoder name="sshd"&gt;
   &lt;program_name&gt;^sshd&lt;/program_name&gt;
 &lt;/decoder&gt;
@@ -591,11 +592,12 @@
 <section>
   <h2>⚙️ Konfigurasi FIM di Wazuh</h2>
   <pre class="code"><code>&lt;syscheck&gt;
-  &lt;directories realtime="yes"&gt;C:\Windows\System32&lt;/directories&gt;
-  &lt;directories realtime="yes"&gt;/etc,/bin&lt;/directories&gt;
-  &lt;registry&gt;HKLM\SOFTWARE&lt;/registry&gt;
+  &lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Downloads&lt;/directories&gt;
+  &lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Desktop&lt;/directories&gt;
+  &lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Documents&lt;/directories&gt;
+  &lt;ignore type="sregex"&gt;\.tmp$|\.log$|\.crdownload$&lt;/ignore&gt;
 &lt;/syscheck&gt;</code></pre>
-  <p class="small dim"><span class="mono">realtime="yes"</span> = deteksi saat itu juga, tanpa menunggu scan.</p>
+  <p class="small dim">Ganti <span class="mono">NAMA_KAMU</span> dgn username Windows-mu. <span class="mono">realtime="yes"</span> = deteksi saat itu juga. Ini isi <span class="mono">fim-config.xml</span> di paket workshop.</p>
 </section>
 
 <!-- Slide 40 -->
@@ -817,6 +819,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
 <section>
   <h2>🧪 Langkah Attack 1 — FIM</h2>
   <table class="qa-table small" style="text-align:left">
+    <tr><td>0️⃣ Persiapan (sekali saja)</td><td>Apply <code>fim-config.xml</code> ke <code>ossec.conf</code> agent (ganti NAMA_KAMU) → restart agent</td></tr>
     <tr><td>1️⃣ Buka Notepad</td><td>Start → ketik "notepad" → Enter</td></tr>
     <tr><td>2️⃣ Tulis apa saja</td><td>Contoh: <code>ini file percobaan FIM</code></td></tr>
     <tr><td>3️⃣ Simpan ke Desktop</td><td>File → Save As → pilih <b>Desktop</b> → nama: <code>lab-fim-test.txt</code> → Save</td></tr>
