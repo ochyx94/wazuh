@@ -87,10 +87,17 @@ Command biasa seperti `whoami` hanya jadi event (level 0) — tidak muncul di da
 <group name="powershell,">
   <rule id="100620" level="3">
     <if_sid>91801</if_sid>
-    <field name="win.eventdata.scriptBlockText" type="pcre2">.+</field>
     <description>PowerShell command executed (Script Block Logging)</description>
     <mitre><id>T1059.001</id></mitre>
   </rule>
+```
+
+> 💡 **Kenapa sederhana?** `if_sid 91801` = semua event dari channel PowerShell.
+> Karena config agent memakai `<query>EventID=4104</query>`, yang datang memang hanya 4104
+> — jadi cukup. Kalau suatu saat query-nya dilepas (semua event PowerShell masuk),
+> tambahkan baris ini di dalam rule supaya hanya 4104 yang jadi alert:
+> `<field name="win.eventdata.scriptBlockText" type="pcre2">.+</field>`
+``
 </group>
 ```
 
