@@ -988,6 +988,27 @@ PSDrive  : HKLM</code></pre>
     <tr><td>5️⃣ Cek di Wazuh</td><td>Dashboard → Discover → filter agent kamu → alert muncul!</td></tr>
   </table>
 </section>
+<!-- Slide: tampilan alert di dashboard -->
+<section>
+  <h2>✅ Tampilan yang Benar di Dashboard</h2>
+  <p class="small">Di Discover (filter <code>rule.groups:powershell</code>), klik alert terbaru — cocokkan dengan ini:</p>
+  <pre class="code" style="font-size:0.62em"><code>"rule": {
+  "level": <b>3</b>,
+  "description": "<b>PowerShell command executed (Script Block Logging)</b>",
+  "id": "<b>100620</b>",
+  "groups": ["powershell"],
+  "mitre": { "id": ["T1059.001"], "tactic": ["Execution"] }
+},
+"scriptBlockText": "{ whoami; cd c:\ }"   ← command yang kamu ketik!</code></pre>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>agent.name</td><td>nama Windows-mu (mis. <span class="mono">windows</span>)</td></tr>
+    <tr><td>data.win.system.eventID</td><td><b>4104</b> — bukti Script Block Logging jalan</td></tr>
+    <tr><td>rule.id</td><td><b>100620</b> — bukti custom rule kamu bekerja</td></tr>
+  </table>
+  <p class="small dim">🔎 Kalau alert tidak muncul: cek timeframe <b>Last 1 hour</b> → index <span class="mono">wazuh-alerts-*</span> → hapus filter ekstra dulu, baru filter powershell. Command = jejak; alert = pengumuman.</p>
+</section>
+
+
 
 <!-- Slide 60 -->
 <section>
