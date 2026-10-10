@@ -100,7 +100,7 @@
         <li>Apa itu SIEM?</li>
         <li>Wazuh sebagai SIEM</li>
         <li>Beberapa fitur Wazuh + alur kerjanya</li>
-        <li>Praktikum: install agent + FIM config + dashboard</li>
+        <li>Praktikum: install agent + dashboard</li>
       </ul>
     </div>
     <div>
@@ -306,8 +306,6 @@
   </div>
   <p class="small dim">vok = akan kita lihat/dipraktikkan hari ini — sisanya cukup dikenali dulu</p>
 </section>
-
-
 
 <!-- Slide 16 -->
 <section>
@@ -608,8 +606,6 @@
   <p class="small dim">💬 Cek di agent setelah config: <span class="mono">C:\Program Files (x86)\ossec-agent\queue\diff\</span> berisi baseline FIM → syscheck aktif.</p>
 </section>
 
-
-
 <!-- Slide 40 -->
 <section>
   <h2>🔎 Fitur Wazuh: Vulnerability Detection (intro singkat)</h2>
@@ -696,26 +692,12 @@ sudo ./manage_agents
 </section>
 
 <!-- Slide 45 -->
-<section>
-  <h2>4️⃣ Aktifkan FIM (Persiapan Attack 1)</h2>
-  <table class="qa-table small" style="text-align:left">
-    <tr><td>1️⃣ Cek username Windows</td><td>Buka <b>PowerShell</b> → ketik <code>echo $env:USERNAME</code> → catat hasilnya</td></tr>
-    <tr><td>2️⃣ Buka file config</td><td>Start → ketik <b>Notepad</b> → klik kanan → <b>Run as Administrator</b> → File → Open → pergi ke <code>C:\Program Files (x86)\ossec-agent\</code> → pilih <b>All Files</b> → buka <code>ossec.conf</code></td></tr>
-    <tr><td>3️⃣ Cari bagian syscheck</td><td>Ctrl+F → ketik <code>&lt;syscheck&gt;</code> → Enter</td></tr>
-    <tr><td>4️⃣ Ganti folder dipantau</td><td>Di antara <code>&lt;syscheck&gt;</code> dan <code>&lt;/syscheck&gt;</code>, tulis (ganti NAMA_KAMU = hasil langkah 1):<br><code>&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Desktop&lt;/directories&gt;</code></td></tr>
-    <tr><td>5️⃣ Simpan</td><td>Ctrl+S (kalau gagal save → file masih bukan Administrator)</td></tr>
-    <tr><td>6️⃣ Restart agent</td><td>PowerShell (Admin): <code>Restart-Service -Name "Wazuh"</code></td></tr>
-  </table>
-  <p class="small dim">✅ Selesai — FIM aktif memantau Desktop-mu. Lanjut ke langkah 5️⃣ Verifikasi.</p>
-</section>
+
 <!-- Slide baru: konfigurasi FIM di Praktikum 1 -->
-
-
-
 
 <!-- Slide 46 -->
 <section>
-  <h2>5️⃣ Verifikasi + Manajemen Service</h2>
+  <h2>4️⃣ Verifikasi + Manajemen Service</h2>
   <p>Dashboard → <b>Agents</b> → Status: <span class="ok"><b>Active</b> (green) ✅</span></p>
   <table class="qa-table small">
     <tr><td>Tidak konek / habis edit config</td><td><b>Restart</b></td></tr>
@@ -840,12 +822,24 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
   </div>
   <p class="small dim">Agent memantau folder Desktop, Downloads, Documents — secara real-time.</p>
 </section>
+<section>
+  <h2>🛠️ Persiapan: Aktifkan FIM</h2>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Cek username Windows</td><td>Buka <b>PowerShell</b> → ketik <code>echo $env:USERNAME</code> → catat hasilnya</td></tr>
+    <tr><td>2️⃣ Buka file config</td><td>Start → ketik <b>Notepad</b> → klik kanan → <b>Run as Administrator</b> → File → Open → pergi ke <code>C:\Program Files (x86)\ossec-agent\</code> → pilih <b>All Files</b> → buka <code>ossec.conf</code></td></tr>
+    <tr><td>3️⃣ Cari bagian syscheck</td><td>Ctrl+F → ketik <code>&lt;syscheck&gt;</code> → Enter</td></tr>
+    <tr><td>4️⃣ Ganti folder dipantau</td><td>Di antara <code>&lt;syscheck&gt;</code> dan <code>&lt;/syscheck&gt;</code>, tulis (ganti NAMA_KAMU = hasil langkah 1):<br><code>&lt;directories check_all="yes" realtime="yes"&gt;C:\Users\NAMA_KAMU\Desktop&lt;/directories&gt;</code></td></tr>
+    <tr><td>5️⃣ Simpan</td><td>Ctrl+S (kalau gagal save → file masih bukan Administrator)</td></tr>
+    <tr><td>6️⃣ Restart agent</td><td>PowerShell (Admin): <code>Restart-Service -Name "Wazuh"</code></td></tr>
+  </table>
+  <p class="small dim">✅ Selesai — FIM aktif memantau Desktop-mu. Lanjut ke langkah 5️⃣ Verifikasi.</p>
+</section>
 
 <!-- Slide 57 -->
 <section>
   <h2>🧪 Langkah Attack 1 — FIM</h2>
   <table class="qa-table small" style="text-align:left">
-    <tr><td>0️⃣ Cek persiapan</td><td>FIM sudah aktif dari Praktikum 1 langkah 4️⃣ (folder Desktop dipantau). Kalau belum, ulangi langkah itu.</td></tr>
+    <tr><td>0️⃣ Prasyarat</td><td>FIM sudah diaktifkan di slide <b>Persiapan</b> sebelumnya. Belum? Kerjakan slide Persiapan dulu.</td></tr>
     <tr><td>1️⃣ Buka Notepad</td><td>Start → ketik "notepad" → Enter</td></tr>
     <tr><td>2️⃣ Tulis apa saja</td><td>Contoh: <code>ini file percobaan FIM</code></td></tr>
     <tr><td>3️⃣ Simpan ke Desktop</td><td>File → Save As → pilih <b>Desktop</b> → nama: <code>lab-fim-test.txt</code> → Save</td></tr>
