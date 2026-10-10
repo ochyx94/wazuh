@@ -13,17 +13,28 @@
 Wazuh tidak bisa melihat command PowerShell kalau **PowerShell Logging** belum aktif.
 Fitur ini standar Windows, hanya perlu dinyalakan.
 
-### Langkah aktifkan (pakai GUI, mudah):
+### Langkah aktifkan (PowerShell, semua versi Windows):
 
-1. Tekan tombol **Windows + R** → ketik `gpedit.msc` → Enter
-2. Di jendela yang terbuka, klik menu di sebelah kiri:
-   `Computer Configuration → Administrative Templates → Windows Components → Windows PowerShell`
-3. Cari di daftar kanan: **"Turn on PowerShell Script Block Logging"**
-4. Klik 2x → pilih **Enabled** → klik **OK**
-5. Tekan **Windows + R** lagi → ketik `cmd` → Enter → ketik `gpupdate /force` → Enter
-6. Selesai ✅
+1. Buka **PowerShell sebagai Administrator**:
+   Tekan **Windows + R** → ketik `powershell` → tekan **Ctrl+Shift+Enter** → klik **Yes**
+2. Paste command ini → Enter:
 
-> 💻 Komputer kantor: kalau `gpedit.msc` tidak ada, hubungi IT admin.
+```powershell
+New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force
+```
+
+3. Paste command ini → Enter:
+
+```powershell
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name EnableScriptBlockLogging -Value 1
+```
+
+4. Selesai ✅ — tidak perlu restart apa pun.
+
+> 💻 Cara ini jalan di semua Windows (Home/Pro/Enterprise).
+> Alternatif Windows Pro (pakai GUI): `Win+R` → `gpedit.msc` → Computer Configuration →
+> Administrative Templates → Windows Components → Windows PowerShell →
+> **"Turn on PowerShell Script Block Logging"** → Enabled → lalu `gpupdate /force`.
 
 ---
 
@@ -178,7 +189,7 @@ rule.groups:syscheck and syscheck.path:*Run*
 |---------|-------------------|
 | Tidak ada alert sama sekali | Cek agent status: `Get-Service WazuhSvc` harus **Running** |
 | FIM tidak deteksi file | Pastikan Desktop ada di config `fim-config.xml`, restart agent |
-| PowerShell tidak tercatat | Ulangi Bagian 0 (gpedit), pastikan Enabled + `gpupdate /force` |
+| PowerShell tidak tercatat | Ulangi Bagian 0 (2 command registry), pastikan tidak ada error merah |
 | Alert delay 1-2 menit | Normal — agent kirim log berkala (bukan real-time penuh) |
 | User baru gagal dibuat | PowerShell belum Run as Administrator |
 
