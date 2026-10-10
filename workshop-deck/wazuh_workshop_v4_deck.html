@@ -433,7 +433,10 @@
 <!-- Slide 27 -->
 <section>
   <h2>🎬 DEMO: Simulator Decoder (tanpa install)</h2>
-  <p>🔗 Buka: <span class="mono">https://simulator.laptopexp.my.id/wazuh_logtest_local.html</span></p>
+  <table class="qa-table" style="width:100%"><tr>
+  <td style="vertical-align:middle">🔗 Buka:<br><span class="mono" style="font-size:0.9em">https://simulator.laptopexp.my.id/wazuh_logtest_local.html</span><br><span class="small dim">atau scan QR 👉</span></td>
+  <td style="width:130px; text-align:center"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAIAAADdBSngAAAE/UlEQVR4nO3dWW5kJwBA0TjKkrz/FXhP1f95URohhlvV53xGriHtKyQMD75er9df0PP37S8A/02aREmTKGkSJU2ipEmUNImSJlHSJEqaREmTqH9Gfuj7+3v39/gfPz8///ovz+8z8jNz73z3VXPv8/yZp9rv9MmoSZQ0iZImUdIkSppEDc3Qn0ZmWHNWzRz3zYjnzP1VYdX/xYja79SoSZQ0iZImUdIkSppETc7Qn07Of1fNW+dWn0e+z75Pn1sfX/UNR6ya6Rs1iZImUdIkSppESZOoZTP0k07u6963rn1y1vyOjJpESZMoaRIlTaKkSdRbztBXPYt999nwfSv4nzGLN2oSJU2ipEmUNImSJlHLZuj7nmJe9eknd7DPzZrv7rrf9z5zjJpESZMoaRIlTaKkSdTkDP3uKu2+U9dOrobvW/t+x9Pdn4yaREmTKGkSJU2ipEnU0Az97lrqiLtPi+/bwT7i7nlu+xg1iZImUdIkSppESZOor9fr9dsfunv/+Mj7jNg3az65+nzy9re5V82V8GTUJEqaREmTKGkSJU2ihmboIz5jFj+ntj981Z72fb9BM3TemDSJkiZR0iRKmkQtW0Pf96o5d9eaV73PyTXrfX8JMUPno0iTKGkSJU2ipEnU5Az96e6NY6v8Obvua+fmPRk1iZImUdIkSppESZOoyyfF3b3L+/npJ1fe983rV/2r3t29b9QkSppESZMoaRIlTaKW3Ye+anV11brtiH37w/e9asTc3etPd+9oM2oSJU2ipEmUNImSJlGTJ8V9xrnoT7V7w/ets+/7v1hVglGTKGkSJU2ipEmUNIla9hz602fcAL7vyeuTz32fXDE3Q+fDSZMoaRIlTaKkSdSy29ZG9Ndtn07uhK/tH7h71p9RkyhpEiVNoqRJlDSJOvoc+tOqde1Vrzr5fUbsux1+1b/hvvV6oyZR0iRKmkRJkyhpEjU0Q983Az05a141l9x3z/vd3el3v+GTUZMoaRIlTaKkSZQ0icrtcv9zzmpbZd9T+Sf/FvFk1CRKmkRJkyhpEiVNoibX0FfNN/eta6961aq1+JNz9nc8Af7JqEmUNImSJlHSJEqaRC07y712Vtu+9d+RTx9R2/d+cq++NXTemDSJkiZR0iRKmkQt2+W+7wSzuzPrfTepjVi1Zn33HreR7/Nk1CRKmkRJkyhpEiVNoibPcj95l/ecu8+Pn/z0uyfJ79sJb9QkSppESZMoaRIlTaKWPYd+8hawfTvqn97xTPi5V636l1/VhlGTKGkSJU2ipEmUNIkamqHvu9l87n3unuV+8tP37XKf+/STt94bNYmSJlHSJEqaREmTqMv3oY84uWO89rz206p3PjnXnmPUJEqaREmTKGkSJU2iJp9Dr93ufdK+Z+dX7UUfcff8eSfF8cakSZQ0iZImUdIkanKG/nTynrKTJ859hpMr+Kt+F0ZNoqRJlDSJkiZR0iRq2Qz9pLm15rvz+lV3tO07SW/fvndr6HwUaRIlTaKkSZQ0iXrLGfqcfU+Ln7yj7eSO+rlXPb+hNXQ+ijSJkiZR0iRKmkQtm6Gf3FW+76y2Ve988s64fffcrfrLgzV0Poo0iZImUdIkSppEfb1er9/+UO0s97szx5N70ffNvk9++hyjJlHSJEqaREmTKGkSNTRDh/OMmkRJkyhpEiVNoqRJlDSJkiZR0iRKmkRJkyhpEvULng7585/amDkAAAAASUVORK5CYII=" alt="QR simulator" style="width:120px; height:120px; background:white; padding:6px; border-radius:6px"></td>
+</tr></table>
   <ol class="tight">
     <li>Masukkan log: <span class="mono">User 'admin' failed login from '192.168.1.100'</span></li>
     <li>Lihat Phase 1: pre-decoding → Phase 2: decoder match → field diekstrak</li>
@@ -625,7 +628,7 @@
   <p class="flow">Cek hostname <span class="arrow">→</span> add agent di manager
   <span class="arrow">→</span> install .msi <span class="arrow">→</span> konfigurasi GUI
   <span class="arrow">→</span> verifikasi</p>
-  <p class="small dim">Waktu: 20 menit · sisakan 5 menit buffer untuk masalah tak terduga</p>
+  <p class="small dim">Waktu: 20 menit · sisakan 5 menit buffer untuk masalah tak terduga<br>📌 Lab ini: manager di WSL laptop-mu sendiri → manager address = <span class="mono">localhost</span>. Kalau nanti manager pindah ke server, ganti jadi IP server.</p>
 </section>
 
 <!-- Slide 42 -->
@@ -912,7 +915,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <tr><td>🎬 Peran kita</td><td>Sebagai "penyerang" yang mencoba login SSH berkali-kali</td></tr>
     <tr><td>👁️ Yang kita amati</td><td>Bagaimana Wazuh menangkap pola brute force</td></tr>
   </table>
-  <p class="small dim">⚠️ Semua pengujian HANYA ke server sendiri — menyerang sistem orang lain tanpa izin = ilegal.</p>
+  <p class="small dim">⏱️ Durasi: 15 menit · ⚠️ Semua pengujian HANYA ke server sendiri — menyerang sistem orang lain tanpa izin = ilegal.</p>
 </section>
 
 <!-- Slide 61 -->
@@ -974,7 +977,7 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <tr><td>Group by</td><td><code>source.ip</code> / level / time · filter by agent</td></tr>
     <tr><td>Interpretasi</td><td>Banyak IP × percobaan berulang = serangan → next step</td></tr>
   </table>
-  <p class="small dim">⚠️ Verifikasi selalu ke log server / dashboard — jangan percaya klaim tanpa bukti.</p>
+  <p class="small dim">⏱️ Durasi: 10 menit · ⚠️ Verifikasi selalu ke log server / dashboard — jangan percaya klaim tanpa bukti.</p>
 </section>
 
 <!-- Slide 66 -->
