@@ -879,8 +879,23 @@ type "C:\Program Files (x86)\ossec-agent\ossec.log"   # lihat log</code></pre>
     <tr><td>2️⃣ Aktifkan logging</td><td>Paste command ini → Enter:<br><code>New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force</code><br><code>Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name EnableScriptBlockLogging -Value 1</code></td></tr>
     <tr><td>3️⃣ Selesai ✅</td><td>Lanjut ke Langkah Attack 2 (PowerShell)</td></tr>
   </table>
-  <p class="small dim">📌 Cara ini jalan di semua Windows (Home/Pro/Enterprise) — tidak butuh gpedit.msc. Alternatif Windows Pro: gpedit.msc → Computer Config → Admin Templates → Windows Components → Windows PowerShell → "Turn on PowerShell Script Block Logging" → Enabled.</p>
+  <p class="small dim">✅ Cara ini jalan di semua Windows (Home/Pro/Enterprise).</p>
 </section>
+<!-- Slide: alternatif GUI gpedit -->
+<section>
+  <h2>🪟 Alternatif GUI: gpedit.msc (Windows Pro)</h2>
+  <p class="small dim">Hasil sama dengan metode PowerShell di slide sebelumnya — pilih salah satu. Windows Home: gunakan metode PowerShell.</p>
+  <table class="qa-table small" style="text-align:left">
+    <tr><td>1️⃣ Buka Group Policy Editor</td><td><code>Win + R</code> → ketik <code>gpedit.msc</code> → Enter</td></tr>
+    <tr><td>2️⃣ Navigasi ke menu</td><td>Computer Configuration → Administrative Templates → Windows Components → <b>Windows PowerShell</b></td></tr>
+    <tr><td>3️⃣ Aktifkan logging</td><td>Klik 2x <b>"Turn on PowerShell Script Block Logging"</b> → pilih <b>Enabled</b> → OK</td></tr>
+    <tr><td>4️⃣ Update policy</td><td><code>Win + R</code> → ketik <code>cmd</code> → Enter → ketik <code>gpupdate /force</code> → Enter</td></tr>
+    <tr><td>5️⃣ Selesai ✅</td><td>Lanjut ke Langkah Attack 2 (PowerShell)</td></tr>
+  </table>
+  <p class="small dim">📌 gpedit.msc hanya ada di Windows Pro/Enterprise/Education — Windows Home: pakai metode PowerShell di slide sebelumnya.</p>
+</section>
+
+
 
 <!-- Slide 59 -->
 <section>
